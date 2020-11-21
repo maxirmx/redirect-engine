@@ -141,7 +141,7 @@ cd libpqxx-6.4.5/
 
 ### compilation of program
 
-goes to folder urlfasthash
+goes to folder engine
 
 
 mkdir release
@@ -159,16 +159,16 @@ set(LIBS section in CMAkeLists.txt
 use prepare_database.sql for initial tables create
 
 ### run app
-cd /home/ivan/Development/urlfasthash/release/
+cd /home/ivan/Development/engine/release/
 mkdir logs
 
 ```
-./app --postgres "user=postgres host=localhost port=5432 dbname=url_proxy" --geoip /home/ivan/Development/urlfasthash/release/geopip/GeoIP.dat --alsologtostderr=1 --log_dir=/home/ivan/Development/urlfasthash/release/logs --v=1 --ip 192.99.10.113
+./app --postgres "user=postgres host=localhost port=5432 dbname=url_proxy" --geoip /home/ivan/Development/geoipdat/GeoIP.dat --alsologtostderr=1 --log_dir=/home/ivan/Development/engine/release/logs --v=1 --ip 192.99.10.113 --use_async_commit=True
 ```
 
 you can add this parameters to control:
 --alsologtostderr=1  - logs to console
---log_dir=/home/ivan/Development/urlfasthash/release/logs
+--log_dir=/home/ivan/Development/engine/release/logs
 --api_http_port 11000     - port for api calls
 --redirect_http_port 12000     - port for client redirections
 --ip 192.99.10.113                  - ip listen on
@@ -202,7 +202,7 @@ curl -v --header "Content-Type: application/json" \
 
 * this command delete domain and all mapping associated with domain
 ```
-curl --header "Content-Type: application/json" \
+curl -v --header "Content-Type: application/json" \
                   --request POST \
                   --data '{"domain" : "192.99.10.113:12000" }' \
                   http://192.99.10.113:11000/api/delete_domain
@@ -213,7 +213,7 @@ curl --header "Content-Type: application/json" \
 * create
 
 ```
-curl --header "Content-Type: application/json" \
+curl -v --header "Content-Type: application/json" \
                   --request POST \
                   --data '{"orig_url":"http://yandex.ru","created_on":"2020-11-17 17:39:49.546162", "expired_on" : "2021-11-17 17:39:49.546162", "sms_uuid":"knockknock", "domain":"192.99.10.113:12000", "whitelist":["RU", "US"]}' \
                   http://192.99.10.113:11000/api/create
@@ -231,7 +231,7 @@ curl -v --header "Content-Type: application/json" \
 * delete
 
 ```
-curl --header "Content-Type: application/json" \
+curl -v --header "Content-Type: application/json" \
                   --request POST \
                   --data '{"newUrl" : "http://localhost:12000/LBItIU" }' \
                   http://192.99.10.113:11000/api/delete_redirect
