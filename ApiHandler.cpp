@@ -20,6 +20,73 @@ ApiHandler::ApiHandler(std::shared_ptr<RedirectProcessor> processor)
 
 }
 
+void ApiHandler::UpdateMapping(std::string body)
+{
+  LOG(INFO) << "[API] update mapping request body: " << body << '\n';
+
+  ptree pt;
+  std::istringstream is(body);
+  boost::property_tree::read_json(is, pt);
+
+  auto info = processor->Load(pt.get<std::string>("newUrl"));
+  if(!info)
+  {
+    ResponseBuilder(downstream_)
+      .status(400, "mapping not found")
+      .send();
+      return;
+  }
+
+  {
+    auto exp_prop = pt.get_optional<std::string>("expired_on");
+    if(exp_prop)
+      info->info.expired_on = RedirectProcessor::TimePointFromString(*exp_prop);
+  }
+
+  {
+    auto orig_url = pt.get_optional<std::string>("orig_url");
+    if(orig_url)
+      info->info.orig_url = *orig_url;
+  }
+
+  {
+    auto sms_uuid = pt.get_optional<std::string>("sms_uuid");
+    if(sms_uuid)
+      info->info.sms_uuid = *sms_uuid;
+  }
+
+  info->info.whiteList.clear();
+  for(auto f: pt.get_child("whitelist"))
+    info->info.whiteList.insert(f.second.get_value<std::string>());
+  
+  processor->UpdateRedirectionInfo(*info);
+  
+  ResponseBuilder(downstream_)
+    .status(200, "OK")
+    .send();
+}
+
+void ApiHandler::DeleteMapping(std::string body)
+{
+  LOG(INFO) << "[API] delete mapping request body: " << body << '\n';
+
+  ptree pt;
+  std::istringstream is(body);
+  boost::property_tree::read_json(is, pt);
+  bool deleted = processor->DeleteRedirectionInfo(pt.get<std::string>("newUrl"));
+  
+  LOG(INFO) << "[API] mapping deleted: " << deleted << '\n';
+
+  if(deleted)
+    ResponseBuilder(downstream_)
+      .status(200, "OK")
+      .send();
+  else
+    ResponseBuilder(downstream_)
+      .status(400, "mapping not found")
+      .send();
+}
+
 void ApiHandler::DeleteDomain(std::string body)
 {
   LOG(INFO) << "[API] delete domain request body: " << body << '\n';
@@ -71,11 +138,14 @@ void ApiHandler::Create(std::string body)
   boost::property_tree::read_json(is, pt);
 
   auto domain = pt.get<std::string>("domain");
-  RedirectInfo info;
+  RedirectInfo info = {};
   info.created_on = processor->TimePointFromString(pt.get<std::string>("created_on"));
   info.expired_on = processor->TimePointFromString(pt.get<std::string>("expired_on"));
   info.orig_url = pt.get<std::string>("orig_url");
   info.sms_uuid = pt.get<std::string>("sms_uuid");
+
+  for(auto f: pt.get_child("whitelist"))
+    info.whiteList.insert(f.second.get_value<std::string>());
   
   LOG(INFO) << "[API] Create request body: " << body << '\n';
   auto newUrl = processor->StoreRedirection(domain, info);
@@ -122,9 +192,21 @@ void ApiHandler::Remap()
 
     ptree pt;
     pt.put("orig_url", redirect_info->info.orig_url);
-    pt.put("created_on", processor->ToTimeStampString(redirect_info->info.created_on));
-    pt.put("expired_on", processor->ToTimeStampString(redirect_info->info.expired_on));
+    pt.put("created_on", RedirectProcessor::ToTimeStampString(redirect_info->info.created_on));
+    pt.put("expired_on", RedirectProcessor::ToTimeStampString(redirect_info->info.expired_on));
     pt.put("sms_uuid", redirect_info->info.sms_uuid);
+
+    ptree whitelist;
+    for(auto wl : redirect_info->info.whiteList)
+    {
+      ptree arrayElement;
+      arrayElement.put_value(wl);
+      whitelist.push_back(std::make_pair("", arrayElement));
+    }
+    
+    pt.put_child("whitelist", whitelist);
+
+
     std::stringstream ss;
     boost::property_tree::json_parser::write_json(ss, pt);
 
@@ -158,6 +240,16 @@ void ApiHandler::onRequest(std::unique_ptr<HTTPMessage> req) noexcept
       waiting_post = true;
       return; // POST processing
     }
+    else if(path == "/api/update_redirect")
+    {
+      waiting_post = true;
+      return; // POST processing
+    }
+    else if(path == "/api/delete_redirect")
+    {
+      waiting_post = true;
+      return; // POST processing
+    }
     else
         throw std::runtime_error("unknown api path: " + path);
   }
@@ -185,6 +277,10 @@ void ApiHandler::onBody(std::unique_ptr<folly::IOBuf> body) noexcept
       UpdateDomain(post_body);
     else if(path == "/api/delete_domain")
       DeleteDomain(post_body);
+    else if(path == "/api/update_redirect")
+      UpdateMapping(post_body);
+    else if(path == "/api/delete_redirect")
+      DeleteMapping(post_body);
     else
       throw std::runtime_error("unknown api:" + path);
   }

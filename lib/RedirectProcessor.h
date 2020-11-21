@@ -105,6 +105,18 @@ public:
         return std::string(res);
     }
 
+    bool DeleteRedirectionInfo(std::string newUrl)
+    {
+        std::lock_guard lock(this->store_redirect_mutex);
+        pqxx::work txn { *this->store_redirects_connection };
+        txn.exec_params("DELETE FROM mappingwl WHERE new_url = $1", 
+                            newUrl);
+        txn.exec_params("DELETE FROM mapping WHERE new_url = $1", 
+                            newUrl);
+        txn.commit();
+        return storage->Remove(newUrl);
+    }
+
     void UpdateRedirectionInfo(const CompleteRedirectInfo cri)
     {
         std::lock_guard lock(this->store_redirect_mutex);

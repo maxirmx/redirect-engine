@@ -21,6 +21,16 @@ public:
         infos[key] = info;
     }
 
+    bool Remove(const TKey &key)
+    {
+        auto r = infos.find(key);
+        if(r == infos.end())
+            return false;
+
+        infos.erase(r);
+        return true;
+    }
+
     std::optional<T> Load(const TKey &key)
     {
         auto r = infos.find(key);
@@ -49,6 +59,14 @@ public:
         bag->Store(key, info);
     }
 
+    bool Remove(const TKey &key, unsigned short c16)
+    {
+        auto v = bags.find(c16);
+        if( v == bags.end() )
+            return false;
+        return v->second->Remove(key);
+    }
+
     std::optional<T> Load(const TKey &key, unsigned short c16)
     {
         auto v = bags.find(c16);
@@ -73,7 +91,7 @@ class BagMutexed
 public:
     void Store(TKey key, T info, unsigned char sec, unsigned short c16)
     {
-        std::lock_guard<std::mutex> guard(rw_mutex);
+        RWWriteGuard _l(&this->rw_lock);
         Bag8<TKey, T>* bag;
         auto v = bags.find(sec);
         if( v == bags.end() )
@@ -83,30 +101,37 @@ public:
         bag->Store(key, info, c16);
     }
 
+    bool Remove(const TKey &key, unsigned char sec, unsigned short c16)
+    {
+        RWWriteGuard _l(&rw_lock);
+        
+        auto v = bags.find(sec);
+        if( v == bags.end() )
+            return false;
+        
+        return v->second->Remove(key, c16);
+    }
+
     std::optional<T> Load(const TKey &key, unsigned char sec, unsigned short c16)
     {
-        Bag8<TKey, T>* bag;
-        {
-            std::lock_guard<std::mutex> guard(rw_mutex);
-            auto v = bags.find(sec);
-            if( v == bags.end() )
-                return std::nullopt;
-            else
-                bag = v->second;
-        }
-
-        return bag->Load(key, c16);
+        RWReadGuard _l(&rw_lock);
+        
+        auto v = bags.find(sec);
+        if( v == bags.end() )
+            return std::nullopt;
+        
+        return v->second->Load(key, c16);
     }
 
     ~BagMutexed()
     {
-        std::lock_guard<std::mutex> guard(rw_mutex);
+        RWWriteGuard _l(&this->rw_lock);
         for(auto v : bags)
             delete v.second;
         bags.clear();
     }
 private:
-    std::mutex rw_mutex;
+    RWLock rw_lock;
     std::map<unsigned char, Bag8<TKey, T>*> bags;
 };
 
@@ -151,6 +176,22 @@ public:
             return std::nullopt;
 
         return v->second->Load(key, second, c16);
+    }
+
+    bool Remove(const TKey key)
+    {
+        RWWriteGuard _g(&this->rwLock);
+
+        auto crc = keyBuilder(key);
+        auto first = (unsigned char)(crc & 0xff);
+        auto second = (unsigned char)((crc & 0xff00) >> 8);
+        auto c16 = (unsigned short)(crc >> 16);
+
+        auto v = bags.find(first);
+        if(v == bags.end() )
+            return false;
+
+        return v->second->Remove(key, second, c16);
     }
 
     void Clear()

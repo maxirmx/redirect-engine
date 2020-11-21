@@ -32,6 +32,8 @@ protected:
   void Create(std::string body);
   void UpdateDomain(std::string body);
   void DeleteDomain(std::string body);
+  void UpdateMapping(std::string body);
+  void DeleteMapping(std::string body);
 
  private:
   std::shared_ptr<RedirectProcessor> processor;

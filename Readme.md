@@ -158,13 +158,6 @@ set(LIBS section in CMAkeLists.txt
 
 use prepare_database.sql for initial tables create
 
-
-create new url
-
-```
-psql -U postgres -d url_proxy -c "INSERT INTO url(url_id, url, created_on, default_url, no_url_failover_url, expired_url_failover_url, out_of_reach_failover_url) VALUES (0, $@'192.99.10.113:12000$@', current_timestamp, $@'http://google.com$@', $@'http://rsdn.ru$@', $@'http://boost.org$@', $@'http://microsoft.com$@');"
-```
-
 ### run app
 cd /home/ivan/Development/urlfasthash/release/
 mkdir logs
@@ -195,19 +188,63 @@ Count: 0
 Loading domains: 9[ms]
 Count: 0
 
-### culr create api
 
-now with curl we can launch this on your local machine ... if 11000 port is opened:
+### API for create/update or delete DOMAIN
+
+* this command create or update domain:
+
+```
+curl -v --header "Content-Type: application/json" \
+                  --request POST \
+                  --data '{"domain" : "192.99.10.113:12000", "expired_on" : "2022-11-17 12:00:00", "default_url" : "http://rsdn.ru", "no_url_failover_url" : "http://google.com", "expired_url_failover_url" : "http://boost.org", "out_of_reach_failover_url" : "http://ori.org", "whitelist" : ["RU", "US"] }' \
+                  http://192.99.10.113:11000/api/update_domain
+```
+
+* this command delete domain and all mapping associated with domain
+```
+curl --header "Content-Type: application/json" \
+                  --request POST \
+                  --data '{"domain" : "192.99.10.113:12000" }' \
+                  http://192.99.10.113:11000/api/delete_domain
+```
+
+### API for redirect create/update/delete
+
+* create
 
 ```
 curl --header "Content-Type: application/json" \
-		  --request POST \
-		  --data '{"orig_url":"https://stackoverflow.com/","created_on":"2020-11-17 17:39:49.546162", "expired_on" : "2021-11-17 17:39:49.546162", "sms_uuid":"knockknock", "domain":"192.99.10.113:12000"}' \
-		  http://192.99.10.113:11000/api/create
+                  --request POST \
+                  --data '{"orig_url":"http://yandex.ru","created_on":"2020-11-17 17:39:49.546162", "expired_on" : "2021-11-17 17:39:49.546162", "sms_uuid":"knockknock", "domain":"192.99.10.113:12000", "whitelist":["RU", "US"]}' \
+                  http://192.99.10.113:11000/api/create
 ```
 
-### watch clicks table
+* update
+
+```
+curl -v --header "Content-Type: application/json" \
+                  --request POST \
+                  --data '{"newUrl" : "http://192.99.10.113:12000/LBItIU", "orig_url" : "http://lamoda.ru", "expired_on" : "2022-11-17 12:00:00", "sms_uuid" : "ywtwy", "whitelist" : ["", "RU", "US"]}' \
+                  http://192.99.10.113:11000/api/update_redirect
+```
+
+* delete
+
+```
+curl --header "Content-Type: application/json" \
+                  --request POST \
+                  --data '{"newUrl" : "http://localhost:12000/LBItIU" }' \
+                  http://192.99.10.113:11000/api/delete_redirect
+```
+
+
+
+
+
+
+### watch clicks table count
 
 ```
 psql -U postgres -d url_proxy -c "select * from clicks"
 ```
+

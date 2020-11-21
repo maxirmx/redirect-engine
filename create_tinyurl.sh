@@ -1,6 +1,6 @@
 #!/bin/bash
 
-for i in {0..100000}
+for i in {0..0}
   do
         curl --header "Content-Type: application/json" \
                   --request POST \
