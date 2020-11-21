@@ -93,9 +93,14 @@ void RedirectHandler::onRequest(std::unique_ptr<HTTPMessage> req) noexcept
       }else
       {
         bool blockByCountry = false;
+
         if(!redirectInfo->domain.whitelist.empty()
           && redirectInfo->domain.whitelist.find(clickInfo.CountryCode) == redirectInfo->domain.whitelist.end())
             blockByCountry = true;
+
+        if(!redirectInfo->info.whiteList.empty()
+          && redirectInfo->info.whiteList.find(clickInfo.CountryCode) == redirectInfo->info.whiteList.end())
+          blockByCountry = true;
 
         if(blockByCountry)
         {

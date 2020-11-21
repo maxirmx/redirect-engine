@@ -211,7 +211,7 @@ public:
     {
         pqxx::result map_wl { trx.exec("SELECT new_url, country_iso from mappingwl order by new_url") };
         std::optional<std::string> curURL = std::nullopt;
-        std::vector<std::string> curWL;
+        std::unordered_set<std::string> curWL;
         for(auto r : map_wl)
         {
             auto newUrl = r[0].as<std::string>();
@@ -230,7 +230,7 @@ public:
             }
 
             curURL = newUrl;
-            curWL.push_back(wl);
+            curWL.insert(wl);
         }
 
         if(curURL && !curWL.empty())
