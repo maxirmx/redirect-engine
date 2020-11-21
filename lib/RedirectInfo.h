@@ -14,6 +14,7 @@ public:
     std::chrono::system_clock::time_point created_on;
     std::chrono::system_clock::time_point expired_on;
     std::string sms_uuid;
+    std::vector<std::string> whiteList;
 };
 
 struct DomainInfo

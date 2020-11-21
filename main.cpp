@@ -37,6 +37,7 @@ DEFINE_int32(threads,
              0,
              "Number of threads to listen on. Numbers <= 0 "
              "will use the number of cores on this machine.");
+DEFINE_bool(use_async_commit, false, "Use async commit for newURL storage");
 
 DEFINE_int32(clicks_bulk, 10000, "Number of messages in queue throttle for reporting");
 
@@ -111,6 +112,7 @@ int main(int argc, char* argv[]) {
   }
 
   auto processor = std::make_shared<RedirectProcessor>(FLAGS_postgres, gi);
+  processor->use_async_store = FLAGS_use_async_commit;
   auto clickReporter = std::make_shared<Reporting<ClickInfo>>(std::make_unique<PBULKBackendClicks>(FLAGS_postgres), FLAGS_clicks_bulk);
 
 // ============================ API =============================== //

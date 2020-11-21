@@ -24,6 +24,8 @@ typedef std::minstd_rand Generator;
 class RedirectProcessor
 {
 public:
+    bool use_async_store = false;
+
     RedirectProcessor(std::string postgres, GeoIP *geoIP)
     {
         this->postgres = postgres;
@@ -66,6 +68,9 @@ public:
     {
         std::lock_guard lock(this->store_redirect_mutex);
         pqxx::work txn{*this->store_redirects_connection};
+
+        if(use_async_store)
+            txn.exec("BEGIN; SET synchronous_commit TO OFF;");
 
         CreateDomainIfNotExist(targetDomain, txn);
         int currentDigits = 6;
@@ -202,6 +207,44 @@ public:
         return res;
     }
 
+    void LoadInitialURLWhiteList(pqxx::work &trx)
+    {
+        pqxx::result map_wl { trx.exec("SELECT new_url, country_iso from mappingwl order by new_url") };
+        std::optional<std::string> curURL = std::nullopt;
+        std::vector<std::string> curWL;
+        for(auto r : map_wl)
+        {
+            auto newUrl = r[0].as<std::string>();
+            auto wl = r[1].as<std::string>();
+
+            if(curURL && *curURL != newUrl)
+            {
+                auto ri = this->storage->Load(*curURL);
+                if(ri)
+                {
+                    ri->whiteList = curWL;
+                    this->storage->StoreInfo(*curURL, *ri);
+                }
+
+                curWL.clear();
+            }
+
+            curURL = newUrl;
+            curWL.push_back(wl);
+        }
+
+        if(curURL && !curWL.empty())
+        {
+            auto ri = this->storage->Load(*curURL);
+            if(ri)
+            {
+                ri->whiteList = curWL;
+                this->storage->StoreInfo(*curURL, *ri);
+                curWL.clear();
+            }
+        }
+    }
+
     void LoadCompletePG()
     {
         std::chrono::steady_clock::time_point load_begin = std::chrono::steady_clock::now();
@@ -212,7 +255,7 @@ public:
 
         for (auto row: records)
         {
-            RedirectInfo info;
+            RedirectInfo info = {};
 
             auto new_url = row[1].as<std::string>();
 
@@ -225,6 +268,8 @@ public:
         }
 
         std::chrono::steady_clock::time_point load_end = std::chrono::steady_clock::now();
+
+        LoadInitialURLWhiteList(W);
 
         std::cout << "Loading tree from db = " << std::chrono::duration_cast<std::chrono::milliseconds>(load_end - load_begin).count() << "[ms]" << std::endl;
         std::cout << "Count: " << records.size() << '\n';

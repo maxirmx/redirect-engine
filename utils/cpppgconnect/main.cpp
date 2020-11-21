@@ -3,8 +3,6 @@
 #include "sys/time.h"
 
 #include <chrono>
-#include "../../lib/RowsStorage.h"
-#include "../../lib/RedirectInfo.h"
 #include "../../lib/RedirectProcessor.h"
 #include "../../lib/Reporting.h"
 #include "../../lib/PBULKBackendClicks.h"

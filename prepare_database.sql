@@ -34,6 +34,8 @@ TABLESPACE pg_default;
 ALTER TABLE public.mapping
     OWNER to postgres;
 
+CREATE INDEX "newUrlIndex" ON public.mapping USING btree (new_url COLLATE pg_catalog."default" varchar_ops ASC NULLS LAST) TABLESPACE pg_default;
+
 -- Table: public.url
 
 -- DROP TABLE public.url;
@@ -70,3 +72,26 @@ TABLESPACE pg_default;
 
 ALTER TABLE public.url_whitelist
     OWNER to postgres;
+
+-- Table: public.mappingwl
+
+-- DROP TABLE public.mappingwl;
+
+CREATE TABLE public.mappingwl
+(
+    new_url character varying(64) COLLATE pg_catalog."default" NOT NULL,
+    country_iso character varying(8) COLLATE pg_catalog."default" NOT NULL
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE public.mappingwl
+    OWNER to postgres;
+-- Index: newURLWLIndex
+
+-- DROP INDEX public."newURLWLIndex";
+
+CREATE INDEX "newURLWLIndex"
+    ON public.mappingwl USING btree
+    (new_url COLLATE pg_catalog."default" varchar_ops ASC NULLS LAST)
+    TABLESPACE pg_default;

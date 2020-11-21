@@ -58,7 +58,9 @@ set(LIBS
         pqxx
         GeoIP
         ${Boost_DATE_TIME_LIBRARY}
-        ${Boost_REGEX_LIBRARY})
+        ${Boost_REGEX_LIBRARY}
+        lzma
+        bz2)
 
 add_executable(app ${SOURCES})
 target_link_libraries(${PROJECT_NAME} ${LIBS})
