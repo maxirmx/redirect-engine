@@ -86,7 +86,7 @@ void RedirectHandler::onRequest(std::unique_ptr<HTTPMessage> req) noexcept
     {
       clickInfo.sms_uuid = redirectInfo->info.sms_uuid;
 
-      if(redirectInfo->info.expired_on < clickInfo.clicked_on)
+      if(redirectInfo->info.expired_on < clickInfo.clicked_on || redirectInfo->domain.expired_on < clickInfo.clicked_on)
       {
         redirectedUrl = redirectInfo->domain.expired_url_failover_url;
         clickInfo.Type = RedirectType::EXPIRED;

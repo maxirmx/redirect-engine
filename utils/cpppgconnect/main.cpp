@@ -7,8 +7,6 @@
 #include "../../lib/Reporting.h"
 #include "../../lib/PBULKBackendClicks.h"
 #include <chrono>
- 
-
 
 
 int main(int argc, char* argv[]) 
@@ -38,7 +36,21 @@ int main(int argc, char* argv[])
     }
 
     RedirectProcessor p(connectionInfo, gi);
-    p.AddToWhitelist("localhost:12000", "RU");
+
+    DomainInfo domain;
+    domain.created_on = std::chrono::system_clock::now();
+    domain.expired_on = domain.created_on + std::chrono::hours(24 * 365);
+    domain.default_url = "http://boost.org";
+    domain.expired_url_failover_url = "http://rsdn.ru";
+    domain.no_url_failover_url = "http://microsoft.com";
+    domain.out_of_reach_failover_url = "http://google.com";
+    domain.url = "localhost:12000";
+    
+    domain.whitelist = std::unordered_set<std::string> { "RU", "TW " };
+
+
+    p.UpdateDomain(domain);
+
     auto c1 = p.GetCountryFromAddress("127.0.0.1");
     auto c2 = p.GetCountryFromAddress("77.88.55.117");
     
@@ -54,6 +66,12 @@ int main(int argc, char* argv[])
     sampleInfo.created_on = now;
     sampleInfo.expired_on = now;
 
-    std::cout << p.StoreRedirection("localhost:13000", sampleInfo).newUrl << std::endl;
+    auto stored = p.StoreRedirection("localhost:12000", sampleInfo);
+    auto redInfo = p.Load(stored.newUrl);
+    p.UpdateRedirectionInfo(*redInfo);
+    p.UpdateDomain(redInfo->domain);
+    std::cout << stored.newUrl << std::endl;
+
+    p.DeleteDomain("localhost:12000");
     GeoIP_delete(gi);
 }

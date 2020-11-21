@@ -5,6 +5,7 @@
 #include <functional>
 #include <mutex>
 #include <optional>
+#include "RWLock.h"
 
 static unsigned long StringKeyCrc32(std::string key)
 {
@@ -120,6 +121,8 @@ public:
 
     void StoreInfo(TKey key, T info)
     {
+        RWWriteGuard _g(&this->rwLock);
+
         auto crc = keyBuilder(key);
         auto first = (unsigned char)(crc & 0xff);
         auto second = (unsigned char)((crc & 0xff00) >> 8);
@@ -127,10 +130,7 @@ public:
         BagMutexed<TKey, T>* bag;
         auto v = bags.find(first);
         if( v == bags.end() )
-        {
-            std::lock_guard<std::mutex> guard(rw_mutex);
             bags[first] = bag = new BagMutexed<TKey, T>();
-        }
         else
             bag = v->second;        
         
@@ -139,33 +139,36 @@ public:
 
     std::optional<T> Load(std::string key)
     {
+        RWReadGuard _l(&this->rwLock);
+
         auto crc = keyBuilder(key);
         auto first = (unsigned char)(crc & 0xff);
         auto second = (unsigned char)((crc & 0xff00) >> 8);
         auto c16 = (unsigned short)(crc >> 16);
 
-        
-        typename std::map<unsigned char, BagMutexed<TKey, T>*>::iterator v;
-        {
-            std::lock_guard<std::mutex> guard(rw_mutex);
-            v = bags.find(first);
-        }
-        
+        auto v = bags.find(first);
         if(v == bags.end() )
             return std::nullopt;
 
         return v->second->Load(key, second, c16);
     }
 
-    ~Storage()
+    void Clear()
     {
+        RWWriteGuard _g(&this->rwLock);
+
         for(auto v : bags)
             delete v.second;
         bags.clear();
     }
 
+    ~Storage()
+    {
+        Clear();
+    }
+
 private:
     std::function<unsigned long(const TKey)> keyBuilder;
-    std::mutex rw_mutex;
+    RWLock rwLock;
     std::map<unsigned char, BagMutexed<TKey, T>*> bags;
 };

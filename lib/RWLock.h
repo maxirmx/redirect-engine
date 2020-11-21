@@ -1,4 +1,6 @@
-#pragma once;
+#pragma once
+#include <memory>
+#include <condition_variable>
 #include <memory>
 
 
@@ -52,4 +54,43 @@ private:
     int                     active_readers;
     int                     waiting_writers;
     int                     active_writers;
+};
+
+class RWWriteGuard
+{
+public:
+    RWWriteGuard(RWLock *lock)
+    {
+        this->lock = lock;
+        lock->WriteLock();
+    }
+
+    ~RWWriteGuard()
+    {
+        lock->WriteUnlock();
+    }
+    
+private:
+    
+
+    RWLock *lock;
+};
+
+class RWReadGuard
+{
+public:
+    RWReadGuard(RWLock *lock)
+    {
+        this->lock = lock;
+        lock->ReadLock();
+    }
+
+    ~RWReadGuard()
+    {
+        lock->ReadUnlock();
+    }
+private:
+    
+
+    RWLock *lock;
 };

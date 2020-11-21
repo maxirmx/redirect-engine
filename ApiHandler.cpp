@@ -20,19 +20,44 @@ ApiHandler::ApiHandler(std::shared_ptr<RedirectProcessor> processor)
 
 }
 
-void ApiHandler::Whitelist(std::string body)
+void ApiHandler::DeleteDomain(std::string body)
+{
+  LOG(INFO) << "[API] delete domain request body: " << body << '\n';
+
+  ptree pt;
+  std::istringstream is(body);
+  boost::property_tree::read_json(is, pt);
+  processor->DeleteDomain(pt.get<std::string>("domain"));
+
+  LOG(INFO) << "[API] domain deleted: " << body << '\n';
+
+  ResponseBuilder(downstream_)
+    .status(200, "OK")
+    .send();
+}
+
+void ApiHandler::UpdateDomain(std::string body)
 {
   ptree pt;
   std::istringstream is(body);
   boost::property_tree::read_json(is, pt);
 
-  LOG(INFO) << "[API] Whitelist request body: " << body << '\n';
+  LOG(INFO) << "[API] update domain request body: " << body << '\n';
 
-  auto url = pt.get<std::string>("url");
-  auto country = pt.get<std::string>("country");
-  processor->AddToWhitelist(url, country);
+  DomainInfo info = {};
+  info.url = pt.get<std::string>("domain");
+  info.expired_on = RedirectProcessor::TimePointFromString(pt.get<std::string>("expired_on"));
+  info.default_url = pt.get<std::string>("default_url");
+  info.no_url_failover_url = pt.get<std::string>("no_url_failover_url");
+  info.expired_url_failover_url = pt.get<std::string>("expired_url_failover_url");
+  info.out_of_reach_failover_url = pt.get<std::string>("out_of_reach_failover_url");
+  
+  for(auto f: pt.get_child("whitelist"))
+    info.whitelist.insert(f.second.get_value<std::string>());
 
-  LOG(INFO) << "[API] Whitelist request complete: ";  
+  processor->UpdateDomain(info);
+
+  LOG(INFO) << "[API] update domain request complete: ";  
 
   ResponseBuilder(downstream_)
     .status(200, "OK")
@@ -123,7 +148,12 @@ void ApiHandler::onRequest(std::unique_ptr<HTTPMessage> req) noexcept
       waiting_post = true;
       return; // POST processing
     }
-    else if(path == "/api/whitelist")
+    else if(path == "/api/update_domain")
+    {
+      waiting_post = true;
+      return; // POST processing
+    }
+    else if(path == "/api/delete_domain")
     {
       waiting_post = true;
       return; // POST processing
@@ -151,8 +181,10 @@ void ApiHandler::onBody(std::unique_ptr<folly::IOBuf> body) noexcept
   {
     if(path == "/api/create")
       Create(post_body);
-    else if(path == "/api/whitelist")
-      Whitelist(post_body);
+    else if(path == "/api/update_domain")
+      UpdateDomain(post_body);
+    else if(path == "/api/delete_domain")
+      DeleteDomain(post_body);
     else
       throw std::runtime_error("unknown api:" + path);
   }

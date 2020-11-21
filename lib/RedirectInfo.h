@@ -38,6 +38,7 @@ struct CompleteRedirectInfo
 public:
     RedirectInfo info;
     DomainInfo domain;
+    std::string newUrl;
 };
 
 enum RedirectType

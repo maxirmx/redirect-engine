@@ -30,7 +30,8 @@ class ApiHandler : public proxygen::RequestHandler {
 protected:
   void Remap();
   void Create(std::string body);
-  void Whitelist(std::string body);
+  void UpdateDomain(std::string body);
+  void DeleteDomain(std::string body);
 
  private:
   std::shared_ptr<RedirectProcessor> processor;
