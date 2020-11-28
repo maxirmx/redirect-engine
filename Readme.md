@@ -1,12 +1,10 @@
 # centos 7 compilation info
 
 
-sudo yum check-update
-sudo yum install centos-release-scl
-sudo yum install devtoolset-8
-
-yum install boost-devel glog-devel double-conversion-devel snappy-devel jemalloc-devel fmt-devel libsodium-devel gtest-devel gmock-devel gperf libzstd-devel xmlto lzma-devel
-
+- sudo yum check-update
+- sudo yum install centos-release-scl
+- sudo yum install devtoolset-8
+- yum install boost-devel glog-devel double-conversion-devel snappy-devel jemalloc-devel fmt-devel libsodium-devel gtest-devel gmock-devel gperf libzstd-devel xmlto lzma-devel
 
 ## turn on modern GCC
 
@@ -15,7 +13,7 @@ scl enable devtoolset-8 bash
 and check that gcc version is more than 8.3.1
 gcc --version
 
-now we can compile libraries
+**Now we can compile libraries**
 
 
 ## compile from sources code
@@ -41,7 +39,7 @@ now we can compile libraries
 - sudo make install
 
 
-### fmt
+### Fmt
 - cd ~/Development/
 - wget https://github.com/fmtlib/fmt/archive/7.1.2.tar.gz -O fmt.tar.gz
 - tar -xzvf fmt.tar.gz
@@ -131,10 +129,10 @@ now we can compile libraries
 - cmake ../
 - make
 
-**and watch on compilation error or link troubles.
+**And watch on compilation error or link troubles.
 If there are some linker troubles you can add needed libraries in** 
 
-**set(LIBS section in CMAkeLists.txt**
+**set LIBS section in CmakeLists.txt**
 
 ### create database
 
