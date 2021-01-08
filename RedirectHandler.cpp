@@ -127,12 +127,23 @@ void RedirectHandler::onRequest(std::unique_ptr<HTTPMessage> req) noexcept
     clickInfo.replaced_url = redirectedUrl;
     clickReporting->Report(clickInfo);
 
-    LOG(INFO) << "[REDIRECT] :"
-        + ToString(clickInfo.Type)
-        + " newUrl: " + newUrl 
-        + " origURL: " + redirectInfo->info.orig_url
-        + " Country: " + clickInfo.CountryCode
-        + " IP: " + clickInfo.clientIP;
+    if(!redirectInfo)
+    {
+      LOG(INFO) << "[REDIRECT] :"
+          + ToString(clickInfo.Type)
+          + " newUrl: " + newUrl 
+          + " origURL: " + "[WRONG]"
+          + " Country: " + clickInfo.CountryCode
+          + " IP: " + clickInfo.clientIP;
+    }else
+    {
+      LOG(INFO) << "[REDIRECT] :"
+          + ToString(clickInfo.Type)
+          + " newUrl: " + newUrl 
+          + " origURL: " + redirectInfo->info.orig_url
+          + " Country: " + clickInfo.CountryCode
+          + " IP: " + clickInfo.clientIP;
+    }
 
     ResponseBuilder builder(downstream_);
     builder.status(307, "Moved Permanently");
