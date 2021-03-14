@@ -24,8 +24,8 @@ gcc --version
 - wget https://dl.bintray.com/boostorg/release/1.74.0/source/boost_1_74_0.tar.gz -O boost.tar.gz 
 - tar -xzvf boost.tar.gz
 - cd boost_1_74_0/
-- ./bootstrap
-- b2 install --with=all
+- ./bootstrap.sh
+- ./b2 install --with=all
 
 ### CMAKE   needed only if cmake 2 version installed. Needed 3.
 - cd ~/Development/
