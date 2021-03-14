@@ -6,7 +6,7 @@
 - sudo yum install devtoolset-8
 - sudo yum install boost-devel glog-devel double-conversion-devel snappy-devel jemalloc-devel fmt-devel libevent-devel
 - sudo yum install libsodium-devel gtest-devel gmock-devel gperf libzstd-devel xmlto lzma-devel openssl-devel gflags-devel
-- sudo yum install python3 (or python ?) postresql-devel
+- sudo yum install python3 python postresql-devel
 
 ## turn on modern GCC
 scl enable devtoolset-8 bash
