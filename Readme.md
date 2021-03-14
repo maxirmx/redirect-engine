@@ -4,40 +4,43 @@
 - sudo yum check-update
 - sudo yum install centos-release-scl
 - sudo yum install devtoolset-8
-- yum install boost-devel glog-devel double-conversion-devel snappy-devel jemalloc-devel fmt-devel libsodium-devel gtest-devel gmock-devel gperf libzstd-devel xmlto lzma-devel
+- sudo yum install boost-devel glog-devel double-conversion-devel snappy-devel jemalloc-devel fmt-devel libsodium-devel gtest-devel gmock-devel gperf libzstd-devel xmlto lzma-devel openssl-devel
 
 ## turn on modern GCC
 
 scl enable devtoolset-8 bash
 
-and check that gcc version is more than 8.3.1
+Check that gcc version is higher than 8.3.1
 gcc --version
 
-**Now we can compile libraries**
+## CMAKE3   This step if required if no cmake or cmake 2.x is installed
+Check it with cmake --version
 
+- cd ~/Development/
+- wget https://github.com/Kitware/CMake/releases/download/v3.19.0/cmake-3.19.0.tar.gz -O cmake.tar.gz
+- tar -xzvf cmake.tar.gz
+- cd cmake-3.19.0/
+- ./bootstrap --prefix=/usr/local
+- make -j12
+- sudo make install
+
+Check that now cmake version is 3.19.0
+cmake --version
+
+
+
+
+**Now we can compile libraries**
 
 ## compile from sources code
 
 ### BOOST
-
 - cd ~/Development/
 - wget https://dl.bintray.com/boostorg/release/1.74.0/source/boost_1_74_0.tar.gz -O boost.tar.gz 
 - tar -xzvf boost.tar.gz
 - cd boost_1_74_0/
 - ./bootstrap.sh
 - ./b2 install --with=all
-
-### CMAKE   needed only if cmake 2 version installed. Needed 3.
-- cd ~/Development/
-- wget https://github.com/Kitware/CMake/releases/download/v3.19.0/cmake-3.19.0.tar.gz -O cmake.tar.gz
-- tar -xzvf cmake.tar.gz
-- cd cmake-3.19.0/
-- mkdir release
-- cd release/
-- cmake ../
-- make -j12
-- sudo make install
-
 
 ### Fmt
 - cd ~/Development/
@@ -51,7 +54,6 @@ gcc --version
 - sudo make install
 
 ### FOLLY
-
 - sudo yum install epel-release
 - sudo yum install boost boost-thread boost-devel
 
