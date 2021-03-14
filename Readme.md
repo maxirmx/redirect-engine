@@ -4,10 +4,11 @@
 - sudo yum check-update
 - sudo yum install centos-release-scl
 - sudo yum install devtoolset-8
-- sudo yum install boost-devel glog-devel double-conversion-devel snappy-devel jemalloc-devel fmt-devel libsodium-devel gtest-devel gmock-devel gperf libzstd-devel xmlto lzma-devel openssl-devel
+- sudo yum install boost-devel glog-devel double-conversion-devel snappy-devel jemalloc-devel fmt-devel libevent-devel
+- sudo yum install libsodium-devel gtest-devel gmock-devel gperf libzstd-devel xmlto lzma-devel openssl-devel gflags-devel
+- sudo yum install python3 (or python ?) postresql-devel
 
 ## turn on modern GCC
-
 scl enable devtoolset-8 bash
 
 Check that gcc version is higher than 8.3.1
@@ -27,9 +28,6 @@ Check it with cmake --version
 Check that now cmake version is 3.19.0
 cmake --version
 
-
-
-
 **Now we can compile libraries**
 
 ## compile from sources code
@@ -40,13 +38,13 @@ cmake --version
 - tar -xzvf boost.tar.gz
 - cd boost_1_74_0/
 - ./bootstrap.sh
-- ./b2 install --with=all
+- ./b2 install --with=all                   
 
 ### Fmt
 - cd ~/Development/
 - wget https://github.com/fmtlib/fmt/archive/7.1.2.tar.gz -O fmt.tar.gz
 - tar -xzvf fmt.tar.gz
-- cd fmt
+- cd fmt-7.1.2
 - mkdir release
 - cd release
 - cmake ../
@@ -54,13 +52,9 @@ cmake --version
 - sudo make install
 
 ### FOLLY
-- sudo yum install epel-release
-- sudo yum install boost boost-thread boost-devel
-
 - cd ~/Development/
 - wget https://github.com/facebook/folly/archive/v2020.11.16.00.tar.gz -O folly.tar.gz
 - tar -xzvf folly.tar.gz
-
 - cd folly-2020.11.16.00/
 - mkdir release
 - cd release
@@ -69,14 +63,13 @@ cmake --version
 - sudo make install
 
 ### FIZZ
-
 - cd ~/Development/
 - wget https://github.com/facebookincubator/fizz/archive/v2020.11.16.00.tar.gz -O fizz.tar.gz
 - tar -xzvf fizz.tar.gz
 - cd fizz-2020.11.16.00/fizz/
 - mkdir release
 - cd release
-- cmake ../
+- cmake -DBUILD_TESTS=FALSE ../              <-- Otherwise we will have an issue with libgmock.  (well-known problem)
 - make
 - sudo make install
 
@@ -97,12 +90,11 @@ cmake --version
 - tar -xzvf proxygen.tar.gz
 - cd proxygen-2020.11.16.00/proxygen/
 - ./build.sh
-- sudo ./install
+- sudo ./install.sh
 
 ## In /usr/local/lib must be cmake for proxygen and proxygen server##
 
 ### GeoIP
-
 - cd ~/Development/
 - wget https://github.com/maxmind/geoip-api-c/archive/v1.6.12.tar.gz -O geoip.tar.gz
 - tar -xzvf geoip.tar.gz
@@ -113,12 +105,15 @@ cmake --version
 
 
 ### pqxx
-
 - cd ~/Development/
 - wget https://github.com/jtv/libpqxx/archive/6.4.5.tar.gz -O pqxx.tar.gz
 - tar -xzvf pqxx.tar.gz
 - cd libpqxx-6.4.5/
-
+- mkdir release
+- cd release
+- cmake ../
+- make
+- sudo make install
 
 
 ### compilation of program
