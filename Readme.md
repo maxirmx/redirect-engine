@@ -4,8 +4,8 @@
 - sudo yum check-update
 - sudo yum install centos-release-scl
 - sudo yum install devtoolset-8
-- sudo yum install boost-devel glog-devel double-conversion-devel snappy-devel jemalloc-devel fmt-devel libevent-devel
-- sudo yum install libsodium-devel gtest-devel gmock-devel gperf libzstd-devel xmlto lzma-devel openssl-devel gflags-devel
+- sudo yum install glog-devel double-conversion-devel snappy-devel jemalloc-devel libevent-devel
+- sudo yum install libsodium-devel gtest-devel gmock-devel gperf libzstd-devel xmlto xz-devel bzip2-devel openssl-devel gflags-devel
 - sudo yum install python3 python postresql-devel
 
 ## turn on modern GCC
@@ -38,51 +38,9 @@ cmake --version
 - tar -xzvf boost.tar.gz
 - cd boost_1_74_0/
 - ./bootstrap.sh
-- ./b2 install --with=all                   
+- ./b2 install --with=all 
 
-### Fmt
-- cd ~/Development/
-- wget https://github.com/fmtlib/fmt/archive/7.1.2.tar.gz -O fmt.tar.gz
-- tar -xzvf fmt.tar.gz
-- cd fmt-7.1.2
-- mkdir release
-- cd release
-- cmake ../
-- make
-- sudo make install
-
-### FOLLY
-- cd ~/Development/
-- wget https://github.com/facebook/folly/archive/v2020.11.16.00.tar.gz -O folly.tar.gz
-- tar -xzvf folly.tar.gz
-- cd folly-2020.11.16.00/
-- mkdir release
-- cd release
-- cmake ../
-- make
-- sudo make install
-
-### FIZZ
-- cd ~/Development/
-- wget https://github.com/facebookincubator/fizz/archive/v2020.11.16.00.tar.gz -O fizz.tar.gz
-- tar -xzvf fizz.tar.gz
-- cd fizz-2020.11.16.00/fizz/
-- mkdir release
-- cd release
-- cmake -DBUILD_TESTS=FALSE ../              <-- Otherwise we will have an issue with libgmock.  (well-known problem)
-- make
-- sudo make install
-
-### WANGLE
-- cd ~/Development/
-- wget https://github.com/facebook/wangle/archive/v2020.11.16.00.tar.gz -O wangle.tar.gz
-- tar -xzvf wangle.tar.gz
-- cd wangle-2020.11.16.00/wangle/
-- mkdir release
-- cd release
-- cmake ../
-- make
-- sudo make install
+### Fmt, FOLLY, FIZZ, WANGLE are built as PROXYGEN dependencies
 
 ### PROXYGEN
 - cd ~/Development/
@@ -92,7 +50,13 @@ cmake --version
 - ./build.sh
 - sudo ./install.sh
 
-## In /usr/local/lib must be cmake for proxygen and proxygen server##
+## proxygen installation can be rebased using cmake files at /usr/local/lib ##
+## otherwise you can just do cp ##
+- cp -R ~/Development/proxygen-2020.11.16.00/proxygen/_build/include/* /usr/local/include/
+- cp -R ~/Development/proxygen-2020.11.16.00/proxygen/_build/lib/* /usr/local/lib/
+- cp -R ~/Development/proxygen-2020.11.16.00/proxygen/_build/deps/include/* /usr/local/include/
+- cp -R ~/Development/proxygen-2020.11.16.00/proxygen/_build/deps/lib/* /usr/local/lib/
+- cp -R ~/Development/proxygen-2020.11.16.00/proxygen/_build/deps/lib64/* /usr/local/lib64/
 
 ### GeoIP
 - cd ~/Development/
@@ -102,7 +66,7 @@ cmake --version
 - ./bootstrap
 - ./configure
 - make -j12
-
+- sudo make install
 
 ### pqxx
 - cd ~/Development/
@@ -117,10 +81,8 @@ cmake --version
 
 
 ### compilation of program
-
-##goes to folder engine##
-
-
+##The repo is assumed to be cloned to ~/Development/engine##
+- cd ~/Development/engine
 - mkdir release
 - cd release
 - cmake ../
