@@ -139,8 +139,8 @@ void RedirectHandler::onRequest(std::unique_ptr<HTTPMessage> req) noexcept
           + " origURL: " + "[WRONG]"
           + " Country: " + clickInfo.CountryCode
           + " IP: " + clickInfo.clientIP 
-          + " Referer" + clickInfo.referer
-          + " User-Agent" + clickInfo.user_agent;
+          + " Referer: " + clickInfo.referer
+          + " User-Agent: " + clickInfo.user_agent;
     } else
     {
       LOG(INFO) << "[REDIRECT] :"
@@ -149,8 +149,8 @@ void RedirectHandler::onRequest(std::unique_ptr<HTTPMessage> req) noexcept
           + " origURL: " + redirectInfo->info.orig_url
           + " Country: " + clickInfo.CountryCode
           + " IP: " + clickInfo.clientIP
-          + " Referer" + clickInfo.referer
-          + " User-Agent" + clickInfo.user_agent;
+          + " Referer: " + clickInfo.referer
+          + " User-Agen: " + clickInfo.user_agent;
     }
 
     ResponseBuilder builder(downstream_);
