@@ -49,6 +49,10 @@ void RedirectHandler::onRequest(std::unique_ptr<HTTPMessage> req) noexcept
     clickInfo.clientIP = message->getClientIP();
     clickInfo.CountryCode = processor->GetCountryFromAddress(clickInfo.clientIP);
 
+    clickInfo.user_agent = headers.getSingleOrEmpty("User-Agent");
+    clickInfo.referer = headers.getSingleOrEmpty("Referer");
+
+
     if(host.empty())
     {
         LOG(ERROR) << "[REDIRECT] no Host in header: ";
@@ -134,15 +138,19 @@ void RedirectHandler::onRequest(std::unique_ptr<HTTPMessage> req) noexcept
           + " newUrl: " + newUrl 
           + " origURL: " + "[WRONG]"
           + " Country: " + clickInfo.CountryCode
-          + " IP: " + clickInfo.clientIP;
-    }else
+          + " IP: " + clickInfo.clientIP 
+          + " Referer" + clickInfo.referer
+          + " User-Agent" + clickInfo.user_agent;
+    } else
     {
       LOG(INFO) << "[REDIRECT] :"
           + ToString(clickInfo.Type)
           + " newUrl: " + newUrl 
           + " origURL: " + redirectInfo->info.orig_url
           + " Country: " + clickInfo.CountryCode
-          + " IP: " + clickInfo.clientIP;
+          + " IP: " + clickInfo.clientIP
+          + " Referer" + clickInfo.referer
+          + " User-Agent" + clickInfo.user_agent;
     }
 
     ResponseBuilder builder(downstream_);
