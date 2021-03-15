@@ -58,5 +58,7 @@ public:
     std::string clientIP;
     std::string sms_uuid;
     std::string CountryCode;
+    std::string referer;
+    std::string user_agent
     RedirectType Type;
 };

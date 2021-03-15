@@ -8,7 +8,10 @@ CREATE TABLE public.clicks
     replaced_url character varying(256) COLLATE pg_catalog."default",
     clicked_on timestamp without time zone,
     from_ip character varying(64) COLLATE pg_catalog."default",
-    sms_uuid character varying(32) COLLATE pg_catalog."default"
+    sms_uuid character varying(32) COLLATE pg_catalog."default",
+    country_iso character varying(2) COLLATE pg_catalog."default",
+    referer character varying(256) COLLATE pg_catalog."default",
+    user_agent character varying(256) COLLATE pg_catalog."default"
 )
 
 TABLESPACE pg_default;

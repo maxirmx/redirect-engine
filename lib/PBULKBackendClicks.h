@@ -19,8 +19,9 @@ protected:
 
         for(auto click : messages)
         {
-            txn.exec_params("INSERT INTO clicks(new_url, replaced_url, clicked_on, from_ip, sms_uuid) VALUES ($1, $2, $3, $4, $5);",
-                        click.newUrl, click.replaced_url, RedirectProcessor::ToTimeStampString(click.clicked_on), click.clientIP, click.sms_uuid );
+            txn.exec_params("INSERT INTO clicks(new_url, replaced_url, clicked_on, from_ip, sms_uuid, country_iso, referer, user_agent) VALUES ($1, $2, $3, $4, $5, $6, $7, $8);",
+                        click.newUrl, click.replaced_url, RedirectProcessor::ToTimeStampString(click.clicked_on), click.clientIP, click.sms_uuid,
+                        click.CountryCode, click.referer, click.user_agent );
         }
 
         txn.commit();
