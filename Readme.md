@@ -1,6 +1,5 @@
 # centos 7 compilation info
 
-
 - sudo yum check-update
 - sudo yum install centos-release-scl
 - sudo yum install devtoolset-8
@@ -8,14 +7,15 @@
 - sudo yum install libsodium-devel gtest-devel gmock-devel gperf libzstd-devel xmlto xz-devel bzip2-devel openssl-devel gflags-devel
 - sudo yum install python3 python postresql-devel
 
-## turn on modern GCC
+**turn on GCC 8.x for current session**
 scl enable devtoolset-8 bash
 
-Check that gcc version is higher than 8.3.1
+**Check that gcc version is higher than 8.3.1**
 gcc --version
 
-## CMAKE3   This step if required if no cmake or cmake 2.x is installed
-Check it with cmake --version
+## CMAKE3   
+**This step if required if no cmake or cmake 2.x is installed**
+**Check it with cmake --version**
 
 - cd ~/Development/
 - wget https://github.com/Kitware/CMake/releases/download/v3.19.0/cmake-3.19.0.tar.gz -O cmake.tar.gz
@@ -25,14 +25,7 @@ Check it with cmake --version
 - make -j12
 - sudo make install
 
-Check that now cmake version is 3.19.0
-cmake --version
-
-**Now we can compile libraries**
-
-## compile from sources code
-
-### BOOST
+## BOOST
 - cd ~/Development/
 - wget https://dl.bintray.com/boostorg/release/1.74.0/source/boost_1_74_0.tar.gz -O boost.tar.gz 
 - tar -xzvf boost.tar.gz
@@ -40,9 +33,8 @@ cmake --version
 - ./bootstrap.sh
 - ./b2 install --with=all 
 
-### Fmt, FOLLY, FIZZ, WANGLE are built as PROXYGEN dependencies
-
-### PROXYGEN
+## PROXYGEN
+**FMT, FOLLY will be built as PROXIGEN dependencies**
 - cd ~/Development/
 - wget https://github.com/facebook/proxygen/archive/v2020.11.16.00.tar.gz -O proxygen.tar.gz
 - tar -xzvf proxygen.tar.gz
@@ -50,8 +42,8 @@ cmake --version
 - ./build.sh
 - sudo ./install.sh
 
-## proxygen installation can be rebased using cmake files at /usr/local/lib ##
-## otherwise you can just do cp ##
+**proxygen installation can be rebased using cmake files at /usr/local/lib**
+**otherwise you can just do cp**
 - cp -R ~/Development/proxygen-2020.11.16.00/proxygen/_build/include/* /usr/local/include/
 - cp -R ~/Development/proxygen-2020.11.16.00/proxygen/_build/lib/* /usr/local/lib/
 - cp -R ~/Development/proxygen-2020.11.16.00/proxygen/_build/deps/include/* /usr/local/include/
