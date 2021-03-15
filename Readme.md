@@ -8,10 +8,13 @@
 - sudo yum install python3 python postresql-devel
 
 **turn on GCC 8.x for current session**
+
 scl enable devtoolset-8 bash
 
 **Check that gcc version is higher than 8.3.1**
+
 gcc --version
+
 
 ## CMAKE3   
 **This step if required if no cmake or cmake 2.x is installed**
@@ -25,6 +28,7 @@ gcc --version
 - make -j12
 - sudo make install
 
+
 ## BOOST
 - cd ~/Development/
 - wget https://dl.bintray.com/boostorg/release/1.74.0/source/boost_1_74_0.tar.gz -O boost.tar.gz 
@@ -32,6 +36,7 @@ gcc --version
 - cd boost_1_74_0/
 - ./bootstrap.sh
 - ./b2 install --with=all 
+
 
 ## PROXYGEN
 **FMT, FOLLY, FIZZ, WANGLE will be built as PROXIGEN dependencies**
@@ -50,6 +55,7 @@ gcc --version
 - cp -R ~/Development/proxygen-2020.11.16.00/proxygen/_build/deps/lib/* /usr/local/lib/
 - cp -R ~/Development/proxygen-2020.11.16.00/proxygen/_build/deps/lib64/* /usr/local/lib64/
 
+
 ## GeoIP
 - cd ~/Development/
 - wget https://github.com/maxmind/geoip-api-c/archive/v1.6.12.tar.gz -O geoip.tar.gz
@@ -60,7 +66,8 @@ gcc --version
 - make -j12
 - sudo make install
 
-## pqx
+
+## pqxx
 - cd ~/Development/
 - wget https://github.com/jtv/libpqxx/archive/6.4.5.tar.gz -O pqxx.tar.gz
 - tar -xzvf pqxx.tar.gz
@@ -73,7 +80,7 @@ gcc --version
 
 
 ## compilation of program
-**The repo is assumed to be cloned to ~/Development/engine**
+**The repo is in ~/Development/engine**
 - cd ~/Development/engine
 - mkdir release
 - cd release
@@ -90,11 +97,11 @@ If there are some linker troubles you can add needed libraries in**
 **use prepare_database.sql for initial tables create**
 
 ### run app
-**cd /home/ivan/Development/engine/release/
-mkdir logs**
+- cd ~/Development/engine/release/
+- mkdir logs
 
 ```
-./app --postgres "user=postgres host=localhost port=5432 dbname=url_proxy" --geoip /home/ivan/Development/geoipdat/GeoIP.dat --alsologtostderr=1 --log_dir=/home/ivan/Development/engine/release/logs --v=1 --ip 192.99.10.113 --use_async_commit=True
+./app --postgres "user=postgres host=localhost port=5432 dbname=url_proxy" --geoip ~/Development/geoipdat/GeoIP.dat --alsologtostderr=1 --log_dir=./logs --v=1 --ip 192.99.10.113 --use_async_commit=True
 ```
 `
 you can add this parameters to control:
