@@ -34,7 +34,7 @@ gcc --version
 - ./b2 install --with=all 
 
 ## PROXYGEN
-**FMT, FOLLY will be built as PROXIGEN dependencies**
+**FMT, FOLLY, FIZZ, WANGLE will be built as PROXIGEN dependencies**
 - cd ~/Development/
 - wget https://github.com/facebook/proxygen/archive/v2020.11.16.00.tar.gz -O proxygen.tar.gz
 - tar -xzvf proxygen.tar.gz
@@ -43,14 +43,14 @@ gcc --version
 - sudo ./install.sh
 
 **proxygen installation can be rebased using cmake files at /usr/local/lib**
-**otherwise you can just do cp**
+**otherwise we can just do cp**
 - cp -R ~/Development/proxygen-2020.11.16.00/proxygen/_build/include/* /usr/local/include/
 - cp -R ~/Development/proxygen-2020.11.16.00/proxygen/_build/lib/* /usr/local/lib/
 - cp -R ~/Development/proxygen-2020.11.16.00/proxygen/_build/deps/include/* /usr/local/include/
 - cp -R ~/Development/proxygen-2020.11.16.00/proxygen/_build/deps/lib/* /usr/local/lib/
 - cp -R ~/Development/proxygen-2020.11.16.00/proxygen/_build/deps/lib64/* /usr/local/lib64/
 
-### GeoIP
+## GeoIP
 - cd ~/Development/
 - wget https://github.com/maxmind/geoip-api-c/archive/v1.6.12.tar.gz -O geoip.tar.gz
 - tar -xzvf geoip.tar.gz
@@ -60,7 +60,7 @@ gcc --version
 - make -j12
 - sudo make install
 
-### pqxx
+## pqx
 - cd ~/Development/
 - wget https://github.com/jtv/libpqxx/archive/6.4.5.tar.gz -O pqxx.tar.gz
 - tar -xzvf pqxx.tar.gz
@@ -72,8 +72,8 @@ gcc --version
 - sudo make install
 
 
-### compilation of program
-##The repo is assumed to be cloned to ~/Development/engine##
+## compilation of program
+**The repo is assumed to be cloned to ~/Development/engine**
 - cd ~/Development/engine
 - mkdir release
 - cd release
