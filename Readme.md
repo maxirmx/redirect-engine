@@ -49,12 +49,13 @@ gcc --version
 
 **proxygen installation can be rebased using cmake files at /usr/local/lib**
 **otherwise we can just do cp**
-- cp -R ~/Development/proxygen-2020.11.16.00/proxygen/_build/include/* /usr/local/include/
-- cp -R ~/Development/proxygen-2020.11.16.00/proxygen/_build/lib/* /usr/local/lib/
-- cp -R ~/Development/proxygen-2020.11.16.00/proxygen/_build/deps/include/* /usr/local/include/
-- cp -R ~/Development/proxygen-2020.11.16.00/proxygen/_build/deps/lib/* /usr/local/lib/
-- cp -R ~/Development/proxygen-2020.11.16.00/proxygen/_build/deps/lib64/* /usr/local/lib64/
-
+```
+cp -R ~/Development/proxygen-2020.11.16.00/proxygen/_build/include/* /usr/local/include/
+cp -R ~/Development/proxygen-2020.11.16.00/proxygen/_build/lib/* /usr/local/lib/
+cp -R ~/Development/proxygen-2020.11.16.00/proxygen/_build/deps/include/* /usr/local/include/
+cp -R ~/Development/proxygen-2020.11.16.00/proxygen/_build/deps/lib/* /usr/local/lib/
+cp -R ~/Development/proxygen-2020.11.16.00/proxygen/_build/deps/lib64/* /usr/local/lib64/
+```
 
 ## GeoIP
 - cd ~/Development/
@@ -94,17 +95,18 @@ If there are some linker troubles you can add needed libraries in**
 
 ### create database
 
-**use prepare_database.sql for initial tables create**
+Run prepare_database.sql to initialize the tables 
 
 ### run app
-- cd ~/Development/engine/release/
-- mkdir logs
 
 ```
+cd ~/Development/engine/release/
+mkdir logs
 ./app --postgres "user=postgres host=localhost port=5432 dbname=url_proxy" --geoip ~/Development/geoipdat/GeoIP.dat --alsologtostderr=1 --log_dir=./logs --v=1 --ip 192.99.10.113 --use_async_commit=True
 ```
-`
-you can add this parameters to control:
+
+Command line parameters:
+```
 --alsologtostderr=1  - logs to console
 --log_dir=/home/ivan/Development/engine/release/logs
 --api_http_port 11000     - port for api calls
@@ -114,9 +116,10 @@ you can add this parameters to control:
 --clicks_bulk 1000                - how many clicks stored on one transaction commit in separate thread
 --v=1                             - verbosity level ... if you want to watch verbose messages
 --use_async_commit=True			  - if you need huge count of /api/create calls
-
+```
 
 if it's ok... you wil see something like this:
+```
 I1119 15:19:06.432566 21950 main.cpp:86] api http_port: 11000
 I1119 15:19:06.433118 21950 main.cpp:87] redirect http_port: 12000
 I1119 15:19:06.433142 21950 main.cpp:88] ip: localhost
@@ -125,7 +128,7 @@ Loading tree from db = 4[ms]
 Count: 0
 Loading domains: 9[ms]
 Count: 0
-`
+```
 
 ### API for create/update or delete DOMAIN
 
@@ -174,11 +177,6 @@ curl -v --header "Content-Type: application/json" \
                   --data '{"newUrl" : "http://localhost:12000/LBItIU" }' \
                   http://192.99.10.113:11000/api/delete_redirect
 ```
-
-
-
-
-
 
 ### watch clicks table count
 
