@@ -150,13 +150,16 @@ void RedirectHandler::onRequest(std::unique_ptr<HTTPMessage> req) noexcept
           + " Country: " + clickInfo.CountryCode
           + " IP: " + clickInfo.clientIP
           + " Referer: " + clickInfo.referer
-          + " User-Agen: " + clickInfo.user_agent;
+          + " User-Agent: " + clickInfo.user_agent;
     }
 
     ResponseBuilder builder(downstream_);
-    builder.status(307, "Moved Permanently");
-    builder.header("Location", redirectedUrl);
-    builder.header("sft", "urlfh");
+    builder.status(301, "Moved Permanently");
+    builder.header("location", redirectedUrl);
+    builder.header("cache-control", "private, max-age=90");
+    builder.header("content-security-policy", "referrer always");
+    builder.header("referrer-policy","unsafe-url");
+    
     builder.send();
 }
 
