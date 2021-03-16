@@ -75,6 +75,7 @@ sudo make install
 ```
 
 ## pqxx
+```
 cd ~/Development/
 wget https://github.com/jtv/libpqxx/archive/6.4.5.tar.gz -O pqxx.tar.gz
 tar -xzvf pqxx.tar.gz
