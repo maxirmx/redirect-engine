@@ -1,11 +1,13 @@
 # centos 7 compilation info
 
-- sudo yum check-update
-- sudo yum install centos-release-scl
-- sudo yum install devtoolset-8
-- sudo yum install glog-devel double-conversion-devel snappy-devel jemalloc-devel libevent-devel
-- sudo yum install libsodium-devel gtest-devel gmock-devel gperf libzstd-devel xmlto xz-devel bzip2-devel openssl-devel gflags-devel
-- sudo yum install python3 python postresql-devel
+```
+sudo yum check-update
+sudo yum install centos-release-scl
+sudo yum install devtoolset-8
+sudo yum install glog-devel double-conversion-devel snappy-devel jemalloc-devel libevent-devel
+sudo yum install libsodium-devel gtest-devel gmock-devel gperf libzstd-devel xmlto xz-devel bzip2-devel openssl-devel gflags-devel
+sudo yum install python3 python postresql-devel
+```
 
 **turn on GCC 8.x for current session**
 
@@ -20,33 +22,36 @@ gcc --version
 **This step if required if no cmake or cmake 2.x is installed**
 **Check it with cmake --version**
 
-- cd ~/Development/
-- wget https://github.com/Kitware/CMake/releases/download/v3.19.0/cmake-3.19.0.tar.gz -O cmake.tar.gz
-- tar -xzvf cmake.tar.gz
-- cd cmake-3.19.0/
-- ./bootstrap --prefix=/usr/local
-- make -j12
-- sudo make install
-
+```
+cd ~/Development/
+wget https://github.com/Kitware/CMake/releases/download/v3.19.0/cmake-3.19.0.tar.gz -O cmake.tar.gz
+tar -xzvf cmake.tar.gz
+cd cmake-3.19.0/
+./bootstrap --prefix=/usr/local
+make -j12
+sudo make install
+```
 
 ## BOOST
-- cd ~/Development/
-- wget https://dl.bintray.com/boostorg/release/1.74.0/source/boost_1_74_0.tar.gz -O boost.tar.gz 
-- tar -xzvf boost.tar.gz
-- cd boost_1_74_0/
-- ./bootstrap.sh
-- ./b2 install --with=all 
-
+```
+cd ~/Development/
+wget https://dl.bintray.com/boostorg/release/1.74.0/source/boost_1_74_0.tar.gz -O boost.tar.gz 
+tar -xzvf boost.tar.gz
+cd boost_1_74_0/
+./bootstrap.sh
+./b2 install --with=all 
+```
 
 ## PROXYGEN
 **FMT, FOLLY, FIZZ, WANGLE will be built as PROXIGEN dependencies**
-- cd ~/Development/
-- wget https://github.com/facebook/proxygen/archive/v2020.11.16.00.tar.gz -O proxygen.tar.gz
-- tar -xzvf proxygen.tar.gz
-- cd proxygen-2020.11.16.00/proxygen/
-- ./build.sh
-- sudo ./install.sh
-
+```
+cd ~/Development/
+wget https://github.com/facebook/proxygen/archive/v2020.11.16.00.tar.gz -O proxygen.tar.gz
+tar -xzvf proxygen.tar.gz
+cd proxygen-2020.11.16.00/proxygen/
+./build.sh
+sudo ./install.sh
+```
 **proxygen installation can be rebased using cmake files at /usr/local/lib**
 **otherwise we can just do cp**
 ```
@@ -58,36 +63,38 @@ cp -R ~/Development/proxygen-2020.11.16.00/proxygen/_build/deps/lib64/* /usr/loc
 ```
 
 ## GeoIP
-- cd ~/Development/
-- wget https://github.com/maxmind/geoip-api-c/archive/v1.6.12.tar.gz -O geoip.tar.gz
-- tar -xzvf geoip.tar.gz
-- cd geoip-api-c-1.6.12/
-- ./bootstrap
-- ./configure
-- make -j12
-- sudo make install
-
+```
+cd ~/Development/
+wget https://github.com/maxmind/geoip-api-c/archive/v1.6.12.tar.gz -O geoip.tar.gz
+tar -xzvf geoip.tar.gz
+cd geoip-api-c-1.6.12/
+./bootstrap
+./configure
+make -j12
+sudo make install
+```
 
 ## pqxx
-- cd ~/Development/
-- wget https://github.com/jtv/libpqxx/archive/6.4.5.tar.gz -O pqxx.tar.gz
-- tar -xzvf pqxx.tar.gz
-- cd libpqxx-6.4.5/
-- mkdir release
-- cd release
-- cmake ../
-- make
-- sudo make install
-
+cd ~/Development/
+wget https://github.com/jtv/libpqxx/archive/6.4.5.tar.gz -O pqxx.tar.gz
+tar -xzvf pqxx.tar.gz
+cd libpqxx-6.4.5/
+mkdir release
+cd release
+cmake ../
+make
+sudo make install
+```
 
 ## compilation of program
 **The repo is in ~/Development/engine**
-- cd ~/Development/engine
-- mkdir release
-- cd release
-- cmake ../
-- make
-
+```
+cd ~/Development/engine
+mkdir release
+cd release
+cmake ../
+make
+```
 **And watch on compilation error or link troubles.
 If there are some linker troubles you can add needed libraries in** 
 
