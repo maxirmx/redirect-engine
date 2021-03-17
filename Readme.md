@@ -6,7 +6,7 @@ sudo yum install centos-release-scl
 sudo yum install devtoolset-8
 sudo yum install glog-devel double-conversion-devel snappy-devel jemalloc-devel libevent-devel
 sudo yum install libsodium-devel gtest-devel gmock-devel gperf libzstd-devel xmlto xz-devel bzip2-devel openssl-devel gflags-devel
-sudo yum install python3 python postresql-devel
+sudo yum install python3 postresql-devel
 ```
 
 **turn on GCC 8.x for current session**
@@ -39,7 +39,7 @@ wget https://dl.bintray.com/boostorg/release/1.74.0/source/boost_1_74_0.tar.gz -
 tar -xzvf boost.tar.gz
 cd boost_1_74_0/
 ./bootstrap.sh
-./b2 install --with=all 
+./b2 install --without-python 
 ```
 
 ## PROXYGEN
