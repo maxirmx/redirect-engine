@@ -1,3 +1,4 @@
+// Ph2 completed
 #pragma once
 
 #include <string>
@@ -5,7 +6,6 @@
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <chrono>
 #include <unordered_set>
-
 
 struct RedirectInfo
 {
@@ -15,6 +15,8 @@ public:
     std::chrono::system_clock::time_point expired_on;
     std::string sms_uuid;
     std::unordered_set<std::string> whiteList;
+    std::unordered_set<std::string> refererList;
+    std::unordered_set<std::string> agentList;
 };
 
 struct DomainInfo
@@ -30,7 +32,9 @@ public:
     std::string expired_url_failover_url;
     std::string out_of_reach_failover_url;
 
-    std::unordered_set<std::string> whitelist;
+    std::unordered_set<std::string> whiteList;
+    std::unordered_set<std::string> refererList;
+    std::unordered_set<std::string> agentList;
 };
 
 struct CompleteRedirectInfo

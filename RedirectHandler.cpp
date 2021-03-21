@@ -98,8 +98,8 @@ void RedirectHandler::onRequest(std::unique_ptr<HTTPMessage> req) noexcept
       {
         bool blockByCountry = false;
 
-        if(!redirectInfo->domain.whitelist.empty()
-          && redirectInfo->domain.whitelist.find(clickInfo.CountryCode) == redirectInfo->domain.whitelist.end())
+        if(!redirectInfo->domain.whiteList.empty()
+          && redirectInfo->domain.whiteList.find(clickInfo.CountryCode) == redirectInfo->domain.whiteList.end())
             blockByCountry = true;
 
         if(!redirectInfo->info.whiteList.empty()

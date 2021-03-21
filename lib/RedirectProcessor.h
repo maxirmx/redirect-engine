@@ -89,7 +89,7 @@ public:
         }
         
 
-        UpdateDomainWhiteList(txn, urlID, domainInfo.whitelist);
+        UpdateDomainWhiteList(txn, urlID, domainInfo.whiteList);
         txn.commit();
 
         LoadDomains();
@@ -365,7 +365,7 @@ private:
 
             pqxx::result wl_records { W.exec_params("SELECT country_iso FROM url_whitelist where url_id = $1", info.url_id) };
             for(auto wl : wl_records)
-                info.whitelist.insert(wl[0].as<std::string>());
+                info.whiteList.insert(wl[0].as<std::string>());
 
             domains[info.url] = info;
         }

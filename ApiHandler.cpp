@@ -1,3 +1,4 @@
+// Ph2 completed
 #include "ApiHandler.h"
 
 #include <boost/property_tree/ptree.hpp>
@@ -8,7 +9,6 @@
 #include <glog/logging.h>
 
 using boost::property_tree::ptree;
-
 
 using namespace proxygen;
 
@@ -70,7 +70,23 @@ void ApiHandler::UpdateMapping(std::string body)
       for(auto f: *whitelist)
         info->info.whiteList.insert(f.second.get_value<std::string>());  
   }
-  
+
+  info->info.refererList.clear();
+  {
+    auto refererList = pt.get_child_optional("refererlist");
+    if (refererList)
+      for(auto f: *refererList)
+        info->info.refererList.insert(f.second.get_value<std::string>());  
+  }
+
+  info->info.agentList.clear();
+  {
+    auto agentList = pt.get_child_optional("agentlist");
+    if (agentList)
+      for(auto f: *agentList)
+        info->info.agentList.insert(f.second.get_value<std::string>());  
+  }
+
   
   processor->UpdateRedirectionInfo(*info);
   
@@ -144,10 +160,20 @@ void ApiHandler::UpdateDomain(std::string body)
   info.expired_url_failover_url = pt.get<std::string>("expired_url_failover_url");
   info.out_of_reach_failover_url = pt.get<std::string>("out_of_reach_failover_url");
   
-  auto whitelist = pt.get_child_optional("whitelist");
-  if (whitelist)
-    for(auto f: *whitelist)
-      info.whitelist.insert(f.second.get_value<std::string>());
+  auto whiteList = pt.get_child_optional("whitelist");
+  if (whiteList)
+    for(auto f: *whiteList)
+      info.whiteList.insert(f.second.get_value<std::string>());
+
+  auto refererList = pt.get_child_optional("refererlist");
+  if (refererList)
+    for(auto f: *refererList)
+      info.refererList.insert(f.second.get_value<std::string>());
+
+  auto agentList = pt.get_child_optional("agentlist");
+  if (agentList)
+    for(auto f: *agentList)
+      info.agentList.insert(f.second.get_value<std::string>());
 
   processor->UpdateDomain(info);
 
@@ -174,9 +200,21 @@ void ApiHandler::Create(std::string body)
   if (sms_uuid) 
     info.sms_uuid = *sms_uuid;
 
-  for(auto f: pt.get_child("whitelist"))
-    info.whiteList.insert(f.second.get_value<std::string>());
-  
+  auto whiteList = pt.get_child_optional("whitelist");
+  if (whiteList)
+    for(auto f: *whiteList)
+      info.whiteList.insert(f.second.get_value<std::string>());
+
+  auto refererList = pt.get_child_optional("refererlist");
+  if (refererList)
+    for(auto f: *refererList)
+      info.refererList.insert(f.second.get_value<std::string>());
+
+  auto agentList = pt.get_child_optional("whitelist");
+  if (agentList)
+    for(auto f: *agentList)
+      info.agentList.insert(f.second.get_value<std::string>());
+
   LOG(INFO) << "[API] Create request body: " << body << '\n';
   auto newUrl = processor->StoreRedirection(domain, info);
   LOG(INFO) << "[API] new url created:" << newUrl.newUrl 
@@ -226,16 +264,36 @@ void ApiHandler::Remap()
     pt.put("expired_on", RedirectProcessor::ToTimeStampString(redirect_info->info.expired_on));
     pt.put("sms_uuid", redirect_info->info.sms_uuid);
 
-    ptree whitelist;
+    ptree whiteList;
     for(auto wl : redirect_info->info.whiteList)
     {
       ptree arrayElement;
       arrayElement.put_value(wl);
-      whitelist.push_back(std::make_pair("", arrayElement));
+      whiteList.push_back(std::make_pair("", arrayElement));
     }
-    
-    pt.put_child("whitelist", whitelist);
 
+    pt.put_child("whitelist", whiteList);
+
+    ptree refererList;
+    for(auto rl : redirect_info->info.refererList)
+    {
+      ptree arrayElement;
+      arrayElement.put_value(rl);
+      refererList.push_back(std::make_pair("", arrayElement));
+    }
+
+    pt.put_child("refererlist", refererList);
+
+    ptree agentList;
+    for(auto al : redirect_info->info.agentList)
+    {
+      ptree arrayElement;
+      arrayElement.put_value(al);
+      agentList.push_back(std::make_pair("", arrayElement));
+    }
+
+    pt.put_child("agentlist", agentList);
+    
 
     std::stringstream ss;
     boost::property_tree::json_parser::write_json(ss, pt);
