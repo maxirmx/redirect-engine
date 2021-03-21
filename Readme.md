@@ -101,9 +101,16 @@ If there are some linker troubles you can add needed libraries in**
 
 **set LIBS section in CmakeLists.txt**
 
-### create database
-
-Run prepare_database.sql to initialize the tables 
+### Initialize database
+Run initialization script if you are going to use new database
+```
+psql -fdb.scripts/db.init.sql
+```
+or upgrade the legacy version with 
+```
+psql -fdb.scripts/db.upgrade.x  
+```
+where x - the number of upgrade to apply
 
 ### run app
 
@@ -145,7 +152,7 @@ Count: 0
 ```
 curl -v --header "Content-Type: application/json" \
                   --request POST \
-                  --data '{"domain" : "192.99.10.113:12000", "expired_on" : "2022-11-17 12:00:00", "default_url" : "http://rsdn.ru", "no_url_failover_url" : "http://google.com", "expired_url_failover_url" : "http://boost.org", "out_of_reach_failover_url" : "http://ori.org", "whitelist" : ["RU", "US"] }' \
+                  --data '{"domain" : "192.99.10.113:12000", "expired_on" : "2022-11-17 12:00:00", "default_url" : "http://nyt.com", "no_url_failover_url" : "http://www.washingtonpost.com/", "expired_url_failover_url" : "http://www.latimes.com/", "out_of_reach_failover_url" : "http://www.chicagotribune.com/", "whitelist" : ["RU", "US"]}' \
                   http://192.99.10.113:11000/api/update_domain
 ```
 
@@ -164,7 +171,7 @@ curl -v --header "Content-Type: application/json" \
 ```
 curl -v --header "Content-Type: application/json" \
                   --request POST \
-                  --data '{"orig_url":"http://yandex.ru","created_on":"2020-11-17 17:39:49.546162", "expired_on" : "2021-11-17 17:39:49.546162", "sms_uuid":"knockknock", "domain":"192.99.10.113:12000", "whitelist":["RU", "US"]}' \
+                  --data '{"orig_url":"http://www.dallasnews.com/","created_on":"2020-11-17 17:39:49.546162", "expired_on" : "2021-11-17 17:39:49.546162", "sms_uuid":"827dd855fc1c", "domain":"192.99.10.113:12000", "whitelist":["RU", "US"]}' \
                   http://192.99.10.113:11000/api/create
 ```
 

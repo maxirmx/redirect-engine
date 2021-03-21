@@ -31,10 +31,18 @@ void ApiHandler::UpdateMapping(std::string body)
   auto info = processor->Load(pt.get<std::string>("newUrl"));
   if(!info)
   {
+    std::string msg = std::string("Mapping for ") + pt.get<std::string>("newUrl") + " was not found";
+    LOG(ERROR) << msg << '\n';
+
+    ptree resJson;
+    resJson.put("Error", msg);
+    std::stringstream ss;
+    boost::property_tree::json_parser::write_json(ss, resJson);
     ResponseBuilder(downstream_)
-      .status(400, "mapping not found")
+      .status(404, "Not Found")
+      .body(ss.str())
       .send();
-      return;
+    return;
   }
 
   {
@@ -56,8 +64,13 @@ void ApiHandler::UpdateMapping(std::string body)
   }
 
   info->info.whiteList.clear();
-  for(auto f: pt.get_child("whitelist"))
-    info->info.whiteList.insert(f.second.get_value<std::string>());
+  {
+    auto whitelist = pt.get_child_optional("whitelist");
+    if (whitelist)
+      for(auto f: *whitelist)
+        info->info.whiteList.insert(f.second.get_value<std::string>());  
+  }
+  
   
   processor->UpdateRedirectionInfo(*info);
   
@@ -75,16 +88,28 @@ void ApiHandler::DeleteMapping(std::string body)
   boost::property_tree::read_json(is, pt);
   bool deleted = processor->DeleteRedirectionInfo(pt.get<std::string>("newUrl"));
   
-  LOG(INFO) << "[API] mapping deleted: " << deleted << '\n';
 
-  if(deleted)
+  if (deleted) 
+  {
+    LOG(INFO) << "[API] mapping deleted: " << deleted << '\n';
     ResponseBuilder(downstream_)
       .status(200, "OK")
       .send();
+  }
   else
+  {
+    std::string msg = std::string("Mapping for ") + pt.get<std::string>("newUrl") + " was not found";
+    LOG(ERROR) << msg << '\n';
+
+    ptree resJson;
+    resJson.put("Error", msg);
+    std::stringstream ss;
+    boost::property_tree::json_parser::write_json(ss, resJson);
     ResponseBuilder(downstream_)
-      .status(400, "mapping not found")
+      .status(404, "Not Found")
+      .body(ss.str())
       .send();
+  }
 }
 
 void ApiHandler::DeleteDomain(std::string body)
@@ -119,8 +144,10 @@ void ApiHandler::UpdateDomain(std::string body)
   info.expired_url_failover_url = pt.get<std::string>("expired_url_failover_url");
   info.out_of_reach_failover_url = pt.get<std::string>("out_of_reach_failover_url");
   
-  for(auto f: pt.get_child("whitelist"))
-    info.whitelist.insert(f.second.get_value<std::string>());
+  auto whitelist = pt.get_child_optional("whitelist");
+  if (whitelist)
+    for(auto f: *whitelist)
+      info.whitelist.insert(f.second.get_value<std::string>());
 
   processor->UpdateDomain(info);
 
@@ -142,7 +169,10 @@ void ApiHandler::Create(std::string body)
   info.created_on = processor->TimePointFromString(pt.get<std::string>("created_on"));
   info.expired_on = processor->TimePointFromString(pt.get<std::string>("expired_on"));
   info.orig_url = pt.get<std::string>("orig_url");
-  info.sms_uuid = pt.get<std::string>("sms_uuid");
+
+  auto sms_uuid = pt.get_optional<std::string>("sms_uuid");
+  if (sms_uuid) 
+    info.sms_uuid = *sms_uuid;
 
   for(auto f: pt.get_child("whitelist"))
     info.whiteList.insert(f.second.get_value<std::string>());
@@ -251,15 +281,20 @@ void ApiHandler::onRequest(std::unique_ptr<HTTPMessage> req) noexcept
       return; // POST processing
     }
     else
-        throw std::runtime_error("unknown api path: " + path);
+        throw std::runtime_error("Unknown api path: " + path);
   }
   catch(const std::exception& e)
   {
     LOG(ERROR) << e.what() << '\n';
 
-    ResponseBuilder builder(downstream_);
-    builder.status(400, e.what());
-    builder.send();
+    ptree resJson;
+    resJson.put("Error", e.what());
+    std::stringstream ss;
+    boost::property_tree::json_parser::write_json(ss, resJson);
+    ResponseBuilder(downstream_)
+      .status(400, "Bad Request")
+      .body(ss.str())
+      .send();
   }
 }
 
@@ -282,13 +317,19 @@ void ApiHandler::onBody(std::unique_ptr<folly::IOBuf> body) noexcept
     else if(path == "/api/delete_redirect")
       DeleteMapping(post_body);
     else
-      throw std::runtime_error("unknown api:" + path);
+      throw std::runtime_error("Unknown API: " + path);
   }
   catch(const std::exception& e)
   {
     LOG(ERROR) << e.what() << '\n';
+
+    ptree resJson;
+    resJson.put("Error", e.what());
+    std::stringstream ss;
+    boost::property_tree::json_parser::write_json(ss, resJson);
     ResponseBuilder(downstream_)
-      .status(400, "Wrong url")
+      .status(400, "Bad Request")
+      .body(ss.str())
       .send();
   }
 }
@@ -298,8 +339,17 @@ void ApiHandler::onEOM() noexcept
   ResponseBuilder builder(downstream_);
   if(waiting_post)
   {
-    builder.status(400, "not processed, need body");
-    builder.send();
+    const char * const msg = "Request body was expected";
+    LOG(ERROR) << msg << '\n';
+
+    ptree resJson;
+    resJson.put("Error", msg);
+    std::stringstream ss;
+    boost::property_tree::json_parser::write_json(ss, resJson);
+    ResponseBuilder(downstream_)
+      .status(400, "Bad Request")
+      .body(ss.str())
+      .send();
   }
   
   ResponseBuilder(downstream_)
