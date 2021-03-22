@@ -1,5 +1,3 @@
-// Ph2 completed
-
 #pragma once
 
 #include "RedirectInfo.h"

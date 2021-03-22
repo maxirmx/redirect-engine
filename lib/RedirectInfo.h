@@ -1,4 +1,3 @@
-// Ph2 completed
 #pragma once
 
 #include <string>

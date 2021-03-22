@@ -145,18 +145,30 @@ Loading domains: 9[ms]
 Count: 0
 ```
 
-### API for create/update or delete DOMAIN
+### API to create/update or delete domain
 
-* this command create or update domain:
+* "update_domain" command creates or updates domain:
 
 ```
-curl -v --header "Content-Type: application/json" \
+url -v --header "Content-Type: application/json" \
                   --request POST \
-                  --data '{"domain" : "192.99.10.113:12000", "expired_on" : "2022-11-17 12:00:00", "default_url" : "http://nyt.com", "no_url_failover_url" : "http://www.washingtonpost.com/", "expired_url_failover_url" : "http://www.latimes.com/", "out_of_reach_failover_url" : "http://www.chicagotribune.com/", "whitelist" : ["RU", "US"]}' \
+                  --data  '{"domain" : "192.99.10.113:12000", \
+                            "expired_on" : "2022-11-17 12:00:00", \
+                            "default_url" : "http://nyt.com", \
+                            "no_url_failover_url" : "http://www.washingtonpost.com/", \
+                            "expired_url_failover_url" : "http://www.latimes.com/", \
+                            "out_of_reach_failover_url" : "http://www.chicagotribune.com/", \
+                            "whitelist" : ["", "RU", "US"], \
+                            "referrers" : ["twitter.com", "facebook.com"], \
+                            "user_agents" : ["curl"] }' \
                   http://192.99.10.113:11000/api/update_domain
 ```
+whitelist, referrers, user_agents  are optional
+Empty or missing values mean that any country/referrer/user agent are allowed
+Empty country code matches IPs for which geoposition cannot be obtained
+User agent match is checked up to the first '/' symbol.   For example, if user agent of HTTP request is "curl/2.47" only "curl" will be compared against domain configuration.
 
-* this command delete domain and all mapping associated with domain
+* "delete_domain" command deletes domain and all associated mappings
 ```
 curl -v --header "Content-Type: application/json" \
                   --request POST \
@@ -164,27 +176,50 @@ curl -v --header "Content-Type: application/json" \
                   http://192.99.10.113:11000/api/delete_domain
 ```
 
-### API for redirect create/update/delete
+### API to create, update or delete redirect
 
-* create
+* "create" command creates redirect
 
 ```
 curl -v --header "Content-Type: application/json" \
                   --request POST \
-                  --data '{"orig_url":"http://www.dallasnews.com/","created_on":"2020-11-17 17:39:49.546162", "expired_on" : "2021-11-17 17:39:49.546162", "sms_uuid":"827dd855fc1c", "domain":"192.99.10.113:12000", "whitelist":["RU", "US"]}' \
+                  --data '{"orig_url":"http://www.dallasnews.com/", \
+                  "created_on":"2020-11-17 17:39:49.546162", \
+                  "expired_on" : "2021-11-17 17:39:49.546162", \
+                  "sms_uuid":"827dd855fc1c", \
+                  "domain":"192.99.10.113:12000", \
+                  "whitelist":["", "RU", "US"], \
+                  "referrers" : ["twitter.com", "facebook.com"], \
+                  "user_agents" : ["curl"] }' \
                   http://192.99.10.113:11000/api/create
 ```
+sms_uuid is optional
+whitelist, referrers, user_agents  are optional
+Empty or missing values mean that any country/referrer/user agent are allowed
+Empty country code matches IPs for which geoposition cannot be obtained
+User agent match is checked up to the first '/' symbol.   For example, if user agent of HTTP request is "curl/2.47" only "curl" will be compared against domain configuration.
 
-* update
+* "update_redirect" command updates redirect and associated whitelists, referrers, user agents
 
 ```
 curl -v --header "Content-Type: application/json" \
                   --request POST \
-                  --data '{"newUrl" : "http://192.99.10.113:12000/LBItIU", "orig_url" : "http://lamoda.ru", "expired_on" : "2022-11-17 12:00:00", "sms_uuid" : "ywtwy", "whitelist" : ["", "RU", "US"]}' \
+                  --data '{"newUrl" : "http://192.99.10.113:12000/LBItIU", \
+                  "orig_url" : "http://sacobserver.com/", \
+                  "expired_on" : "2022-11-17 12:00:00", \
+                  "sms_uuid" : "827dd855fd1c", \
+                  "whitelist":["", "AU", "CA"], \
+                  "referrers" : ["twitter.com", "facebook.com"], \
+                  "user_agents" : ["curl"] }' \
                   http://192.99.10.113:11000/api/update_redirect
 ```
+sms_uuid is optional
+whitelist, referrers, user_agents  are optional
+Empty or missing values mean that any country/referrer/user agent are allowed
+Empty country code matches IPs for which geoposition cannot be obtained
+User agent match is checked up to the first '/' symbol.   For example, if user agent of HTTP request is "curl/2.47" only "curl" will be compared against domain configuration.
 
-* delete
+* "delete_redirect" command deletes redirect and all associated whitelists, referrers, user agents
 
 ```
 curl -v --header "Content-Type: application/json" \

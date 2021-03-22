@@ -1,4 +1,3 @@
-// Ph2 completed
 #include "ApiHandler.h"
 
 #include <boost/property_tree/ptree.hpp>
@@ -81,7 +80,7 @@ void ApiHandler::UpdateMapping(std::string body)
 
   info->info.agents.clear();
   {
-    auto agents = pt.get_child_optional("agents");
+    auto agents = pt.get_child_optional("user_agents");
     if (agents)
       for(auto f: *agents)
         info->info.agents.insert(f.second.get_value<std::string>());  
@@ -170,7 +169,7 @@ void ApiHandler::UpdateDomain(std::string body)
     for(auto f: *referrers)
       info.referrers.insert(f.second.get_value<std::string>());
 
-  auto agents = pt.get_child_optional("agents");
+  auto agents = pt.get_child_optional("user_agents");
   if (agents)
     for(auto f: *agents)
       info.agents.insert(f.second.get_value<std::string>());
@@ -210,7 +209,7 @@ void ApiHandler::Create(std::string body)
     for(auto f: *referrers)
       info.referrers.insert(f.second.get_value<std::string>());
 
-  auto agents = pt.get_child_optional("agents");
+  auto agents = pt.get_child_optional("user_agents");
   if (agents)
     for(auto f: *agents)
       info.agents.insert(f.second.get_value<std::string>());
@@ -292,7 +291,7 @@ void ApiHandler::Remap()
       agents.push_back(std::make_pair("", arrayElement));
     }
 
-    pt.put_child("agents", agents);
+    pt.put_child("user_agents", agents);
     
 
     std::stringstream ss;

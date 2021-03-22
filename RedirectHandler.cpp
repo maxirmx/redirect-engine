@@ -59,7 +59,7 @@ void RedirectHandler::onRequest(std::unique_ptr<HTTPMessage> req) noexcept
     if (n == std::string::npos) 
         clickInfo.agent = clickInfo.user_agent;
     else
-        clickInfo.agent = clickInfo.user_agent.substr(n);
+        clickInfo.agent = clickInfo.user_agent.substr(0, n);
  
     clickInfo.referer = headers.getSingleOrEmpty("Referer");
 
@@ -155,27 +155,17 @@ void RedirectHandler::onRequest(std::unique_ptr<HTTPMessage> req) noexcept
     clickInfo.replaced_url = redirectedUrl;
     clickReporting->Report(clickInfo);
 
-    if(!redirectInfo)
-    {
-      LOG(INFO) << "[REDIRECT] :"
+    
+    LOG(INFO) << "[REDIRECT] :"
           + ToString(clickInfo.Type)
           + " newUrl: " + newUrl 
-          + " origURL: " + "[WRONG]"
-          + " Country: " + clickInfo.CountryCode
-          + " IP: " + clickInfo.clientIP 
-          + " Referer: " + clickInfo.referer
-          + " User-Agent: " + clickInfo.user_agent;
-    } else
-    {
-      LOG(INFO) << "[REDIRECT] :"
-          + ToString(clickInfo.Type)
-          + " newUrl: " + newUrl 
-          + " origURL: " + redirectInfo->info.orig_url
+          + " origURL: " + (redirectInfo ? redirectInfo->info.orig_url : "[WRONG]") 
           + " Country: " + clickInfo.CountryCode
           + " IP: " + clickInfo.clientIP
           + " Referer: " + clickInfo.referer
-          + " User-Agent: " + clickInfo.user_agent;
-    }
+          + " User-Agent: " + clickInfo.user_agent
+          + " User Agent TRNC: " + clickInfo.agent;
+    
 
     ResponseBuilder builder(downstream_);
     builder.status(301, "Moved Permanently");
