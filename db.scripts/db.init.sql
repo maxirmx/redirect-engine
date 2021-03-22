@@ -13,7 +13,6 @@ CREATE TABLE public.clicks
     referer character varying(256) COLLATE pg_catalog."default",
     user_agent character varying(256) COLLATE pg_catalog."default"
 )
-
 TABLESPACE pg_default;
 
 ALTER TABLE public.clicks
@@ -32,7 +31,6 @@ CREATE TABLE public.mapping
     expired_on timestamp without time zone NOT NULL,
     sms_uuid character varying(32) COLLATE pg_catalog."default"
 )
-
 TABLESPACE pg_default;
 
 ALTER TABLE public.mapping
@@ -49,13 +47,12 @@ CREATE INDEX "newUrlIndex"
 -- Table: public.mappingwl
 -- DROP TABLE public.mappingwl;
 
-TABLESPACE pg_default;
-
 CREATE TABLE public.mappingwl
 (
     new_url character varying(64) COLLATE pg_catalog."default" NOT NULL,
     country_iso character varying(8) COLLATE pg_catalog."default" NOT NULL
 )
+TABLESPACE pg_default;
 
 ALTER TABLE public.mappingwl
     OWNER to postgres;
@@ -71,13 +68,12 @@ CREATE INDEX "newURLWLIndex"
 -- Table: public.mappingre
 -- DROP TABLE public.mappingre;
 
-TABLESPACE pg_default;
-
 CREATE TABLE public.mappingre
 (
     new_url character varying(64) COLLATE pg_catalog."default" NOT NULL,
     referrer character varying(256) COLLATE pg_catalog."default" NOT NULL
 )
+TABLESPACE pg_default;
 
 ALTER TABLE public.mappingre
     OWNER to postgres;
@@ -93,13 +89,12 @@ CREATE INDEX "newURLREIndex"
 -- Table: public.mappingag
 -- DROP TABLE public.mappingag;
 
-TABLESPACE pg_default;
-
 CREATE TABLE public.mappingag
 (
     new_url character varying(64) COLLATE pg_catalog."default" NOT NULL,
     user_agent character varying(256) COLLATE pg_catalog."default" NOT NULL
 )
+TABLESPACE pg_default;
 
 ALTER TABLE public.mappingag
     OWNER to postgres;
@@ -129,7 +124,6 @@ CREATE TABLE public.url
     out_of_reach_failover_url character varying(128) COLLATE pg_catalog."default",
     CONSTRAINT remap_pkey PRIMARY KEY (url_id)
 )
-
 TABLESPACE pg_default;
 
 ALTER TABLE public.url
@@ -144,7 +138,7 @@ CREATE TABLE public.url_whitelist
     url_id integer NOT NULL,
     country_iso character varying(8) COLLATE pg_catalog."default" NOT NULL
 )
-
+TABLESPACE pg_default;
 
 ALTER TABLE public.url_whitelist
     OWNER to postgres;
@@ -152,14 +146,12 @@ ALTER TABLE public.url_whitelist
 -- Table: public.url_agents
 -- DROP TABLE public.url_agents;
 
-TABLESPACE pg_default;
-
 CREATE TABLE public.url_agents
 (
     url_id integer NOT NULL,
     user_agent character varying(256) COLLATE pg_catalog."default" NOT NULL
 )
-
+TABLESPACE pg_default;
 
 ALTER TABLE public.url_agents
     OWNER to postgres;
@@ -167,14 +159,12 @@ ALTER TABLE public.url_agents
 -- Table: public.url_referrers
 -- DROP TABLE public.url_referrers;
 
-TABLESPACE pg_default;
-
 CREATE TABLE public.url_referrers
 (
     url_id integer NOT NULL,
     referrer character varying(256) COLLATE pg_catalog."default" NOT NULL
 )
-
+TABLESPACE pg_default;
 
 ALTER TABLE public.url_referrers
     OWNER to postgres;

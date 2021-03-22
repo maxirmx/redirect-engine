@@ -6,13 +6,13 @@
 -- Table: public.mappingre
 -- DROP TABLE public.mappingre;
 
-TABLESPACE pg_default;
-
 CREATE TABLE public.mappingre
 (
     new_url character varying(64) COLLATE pg_catalog."default" NOT NULL,
     referrer character varying(256) COLLATE pg_catalog."default" NOT NULL
 )
+TABLESPACE pg_default;
+
 
 ALTER TABLE public.mappingre
     OWNER to postgres;
@@ -28,13 +28,12 @@ CREATE INDEX "newURLREIndex"
 -- Table: public.mappingag
 -- DROP TABLE public.mappingag;
 
-TABLESPACE pg_default;
-
 CREATE TABLE public.mappingag
 (
     new_url character varying(64) COLLATE pg_catalog."default" NOT NULL,
     user_agent character varying(256) COLLATE pg_catalog."default" NOT NULL
 )
+TABLESPACE pg_default;
 
 ALTER TABLE public.mappingag
     OWNER to postgres;
@@ -51,13 +50,12 @@ CREATE INDEX "newURLAGIndex"
 -- Table: public.url_agents
 -- DROP TABLE public.url_agents;
 
-TABLESPACE pg_default;
-
 CREATE TABLE public.url_agents
 (
     url_id integer NOT NULL,
     user_agent character varying(256) COLLATE pg_catalog."default" NOT NULL
 )
+TABLESPACE pg_default;
 
 ALTER TABLE public.url_agents
     OWNER to postgres;
@@ -65,14 +63,12 @@ ALTER TABLE public.url_agents
 -- Table: public.url_referrers
 -- DROP TABLE public.url_referrers;
 
-TABLESPACE pg_default;
-
 CREATE TABLE public.url_referrers
 (
     url_id integer NOT NULL,
     referrer character varying(256) COLLATE pg_catalog."default" NOT NULL
 )
-
+TABLESPACE pg_default;
 
 ALTER TABLE public.url_referrers
     OWNER to postgres;

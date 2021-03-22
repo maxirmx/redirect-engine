@@ -1,5 +1,9 @@
 DROP TABLE url;
 DROP TABLE url_whitelist;
+DROP TABLE url_agents;
+DROP TABLE url_referrers;
 DROP TABLE mapping;
 DROP TABLE mappingwl;
+DROP TABLE mappingre;
+DROP TABLE mappingag;
 DROP TABLE clicks;

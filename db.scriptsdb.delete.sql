@@ -1,0 +1,9 @@
+DELETE FROM public.clicks;
+DELETE FROM public.url;
+DELETE FROM public.url_whitelist;
+DELETE FROM public.url_agents;
+DELETE FROM public.url_referrers;
+DELETE FROM public.mapping;
+DELETE FROM public.mappingwl;
+DELETE FROM public.mappingag;
+DELETE FROM public.mappingre;
