@@ -31,7 +31,7 @@ curl -v --header "Content-Type: application/json" \
 # 2.1
 # ****************
 # To set manually:
-R_KEY="UjTu9u"
+R_KEY="UMAypm"
 # ****************
 # With SMS_UIID, OK
 curl -v --header "Content-Type: application/json" \

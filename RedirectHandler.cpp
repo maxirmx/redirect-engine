@@ -30,6 +30,10 @@ const std::string ToString(RedirectType type)
       return "NOT_FOUND";
     case RedirectType::NOT_IN_WHITELIST:
       return "NOT_IN_WHITELIST";
+    case RedirectType::NO_REFERRER:
+      return "NO_REFERRER";
+    case RedirectType::NO_USER_AGENT:
+      return "NO_USER_AGENT";
   }
 
   return "UNKNOWN";
