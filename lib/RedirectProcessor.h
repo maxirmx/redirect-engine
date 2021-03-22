@@ -1,3 +1,5 @@
+// Ph2 completed
+
 #pragma once
 
 #include "RedirectInfo.h"
@@ -51,7 +53,11 @@ public:
 
         txn.exec_params("DELETE FROM mapping WHERE new_url LIKE $1", "http://" + domain + "%" );
         txn.exec_params("DELETE FROM mappingwl WHERE new_url LIKE $1", "http://" + domain + "%" );
+        txn.exec_params("DELETE FROM mappingre WHERE new_url LIKE $1", "http://" + domain + "%" );
+        txn.exec_params("DELETE FROM mappingag WHERE new_url LIKE $1", "http://" + domain + "%" );
         txn.exec_params("DELETE FROM url_whitelist WHERE url_id = $1;", urlID );
+        txn.exec_params("DELETE FROM url_referrers WHERE url_id = $1;", urlID );
+        txn.exec_params("DELETE FROM url_agents WHERE url_id = $1;", urlID );
         txn.exec_params("DELETE FROM url WHERE url = $1;", domain );
         
 
@@ -81,7 +87,8 @@ public:
             LOG(INFO) << "[API] Created new DOMAIN" 
                         << " url: " << domainInfo.url
                         << " id: " << urlID;
-        }else
+        }
+        else
         {
             urlID = res[0][0].as<int>();
             txn.exec_params("UPDATE url	SET expired_on=$2, default_url=$3, no_url_failover_url=$4, expired_url_failover_url=$5, out_of_reach_failover_url=$6 WHERE url_id = $1",
@@ -90,6 +97,8 @@ public:
         
 
         UpdateDomainWhiteList(txn, urlID, domainInfo.whiteList);
+        UpdateDomainReferrers(txn, urlID, domainInfo.refererList);
+        UpdateDomainAgents(txn, urlID, domainInfo.agentList);
         txn.commit();
 
         LoadDomains();
@@ -109,10 +118,10 @@ public:
     {
         std::lock_guard lock(this->store_redirect_mutex);
         pqxx::work txn { *this->store_redirects_connection };
-        txn.exec_params("DELETE FROM mappingwl WHERE new_url = $1", 
-                            newUrl);
-        txn.exec_params("DELETE FROM mapping WHERE new_url = $1", 
-                            newUrl);
+        txn.exec_params("DELETE FROM mappingwl WHERE new_url = $1", newUrl);
+        txn.exec_params("DELETE FROM mappingre WHERE new_url = $1", newUrl);
+        txn.exec_params("DELETE FROM mappingag WHERE new_url = $1", newUrl);
+        txn.exec_params("DELETE FROM mapping WHERE new_url = $1", newUrl);
         txn.commit();
         return storage->Remove(newUrl);
     }
@@ -127,6 +136,14 @@ public:
         txn.exec_params("DELETE FROM mappingwl WHERE new_url = $1", cri.newUrl);
         for(auto wl : cri.info.whiteList)
             txn.exec_params("INSERT INTO mappingwl(new_url, country_iso) VALUES ($1, $2)", cri.newUrl, wl);
+
+        txn.exec_params("DELETE FROM mappingre WHERE new_url = $1", cri.newUrl);
+        for(auto re : cri.info.refererList)
+            txn.exec_params("INSERT INTO mappingre(new_url, referrer) VALUES ($1, $2)", cri.newUrl, re);
+
+        txn.exec_params("DELETE FROM mappingag WHERE new_url = $1", cri.newUrl);
+        for(auto ag : cri.info.agentList)
+            txn.exec_params("INSERT INTO mappingag(new_url, user_agent) VALUES ($1, $2)", cri.newUrl, ag);
 
         txn.commit();
         storage->StoreInfo(cri.newUrl, cri.info);
@@ -169,6 +186,12 @@ public:
 
         for(auto wl : info.whiteList)
             txn.exec_params("INSERT INTO mappingwl(new_url, country_iso) VALUES ($1, $2)", newUrl, wl);
+
+        for(auto re : info.refererList)
+            txn.exec_params("INSERT INTO mappingre(new_url, referrer) VALUES ($1, $2)", newUrl, re);
+
+        for(auto ag : info.agentList)
+            txn.exec_params("INSERT INTO mappingag(new_url, user_agent) VALUES ($1, $2)", newUrl, ag);
 
         txn.commit();
         storage->StoreInfo(newUrl, info);
@@ -276,6 +299,8 @@ private:
         std::chrono::steady_clock::time_point load_end = std::chrono::steady_clock::now();
 
         LoadInitialURLWhiteList(W);
+        LoadInitialURLReferrers(W);
+        LoadInitialURLAgents(W);
 
         std::cout << "Loading tree from db = " << std::chrono::duration_cast<std::chrono::milliseconds>(load_end - load_begin).count() << "[ms]" << std::endl;
         std::cout << "Count: " << records.size() << '\n';
@@ -319,11 +344,101 @@ private:
         }
     }
 
+    void LoadInitialURLReferrers(pqxx::work &trx)
+    {
+        pqxx::result map_re { trx.exec("SELECT new_url, referrer from mappingre order by new_url") };
+        std::optional<std::string> curURL = std::nullopt;
+        std::unordered_set<std::string> curRE;
+        for(auto r : map_re)
+        {
+            auto newUrl = r[0].as<std::string>();
+            auto re = r[1].as<std::string>();
+
+            if(curURL && *curURL != newUrl)
+            {
+                auto ri = this->storage->Load(*curURL);
+                if(ri)
+                {
+                    ri->refererList = curRE;
+                    this->storage->StoreInfo(*curURL, *ri);
+                }
+
+                curRE.clear();
+            }
+
+            curURL = newUrl;
+            curRE.insert(re);
+        }
+
+        if(curURL && !curRE.empty())
+        {
+            auto ri = this->storage->Load(*curURL);
+            if(ri)
+            {
+                ri->refererList = curRE;
+                this->storage->StoreInfo(*curURL, *ri);
+                curRE.clear();
+            }
+        }
+    }
+
+    void LoadInitialURLAgents(pqxx::work &trx)
+    {
+        pqxx::result map_ag { trx.exec("SELECT new_url, user_agent from mappingag order by new_url") };
+        std::optional<std::string> curURL = std::nullopt;
+        std::unordered_set<std::string> curAG;
+        for(auto r : map_ag)
+        {
+            auto newUrl = r[0].as<std::string>();
+            auto ag = r[1].as<std::string>();
+
+            if(curURL && *curURL != newUrl)
+            {
+                auto ri = this->storage->Load(*curURL);
+                if(ri)
+                {
+                    ri->agentList = curAG;
+                    this->storage->StoreInfo(*curURL, *ri);
+                }
+
+                curAG.clear();
+            }
+
+            curURL = newUrl;
+            curAG.insert(ag);
+        }
+
+        if(curURL && !curAG.empty())
+        {
+            auto ri = this->storage->Load(*curURL);
+            if(ri)
+            {
+                ri->agentList = curAG;
+                this->storage->StoreInfo(*curURL, *ri);
+                curAG.clear();
+            }
+        }
+    }
+
     void UpdateDomainWhiteList(pqxx::work &txn, int urlId, const std::unordered_set<std::string> &countrycodes)
     {   
         txn.exec_params("delete FROM url_whitelist WHERE url_id = $1", urlId);
         for(auto c : countrycodes)
             txn.exec_params("INSERT INTO url_whitelist(url_id, country_iso)	VALUES ($1, $2)", urlId, c);
+    }
+
+    void UpdateDomainReferrers(pqxx::work &txn, int urlId, const std::unordered_set<std::string> &referrers)
+    {   
+        txn.exec_params("delete FROM url_referrers WHERE url_id = $1", urlId);
+        for(auto c : referrers)
+            txn.exec_params("INSERT INTO url_referrers(url_id, referrer) VALUES ($1, $2)", urlId, c);
+    }
+
+    void UpdateDomainAgents(pqxx::work &txn, int urlId, const std::unordered_set<std::string> &agents)
+    {   
+        txn.exec_params("delete FROM url_agents WHERE url_id = $1", urlId);
+        for(auto c : agents)
+            txn.exec_params("INSERT INTO url_agents(url_id, user_agent) VALUES ($1, $2)", urlId, c);
     }
 
     void LoadDomains()
@@ -366,6 +481,14 @@ private:
             pqxx::result wl_records { W.exec_params("SELECT country_iso FROM url_whitelist where url_id = $1", info.url_id) };
             for(auto wl : wl_records)
                 info.whiteList.insert(wl[0].as<std::string>());
+
+            pqxx::result re_records { W.exec_params("SELECT referrer FROM url_referrers where url_id = $1", info.url_id) };
+            for(auto re : re_records)
+                info.refererList.insert(re[0].as<std::string>());
+
+            pqxx::result ag_records { W.exec_params("SELECT user_agent FROM url_agents where url_id = $1", info.url_id) };
+            for(auto ag : ag_records)
+                info.agentList.insert(ag[0].as<std::string>());
 
             domains[info.url] = info;
         }

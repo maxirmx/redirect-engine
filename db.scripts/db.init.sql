@@ -1,5 +1,4 @@
 -- Table: public.clicks
-
 -- DROP TABLE public.clicks;
 
 CREATE TABLE public.clicks
@@ -20,7 +19,6 @@ ALTER TABLE public.clicks
 
 
 -- Table: public.mapping
-
 -- DROP TABLE public.mapping;
 
 CREATE TABLE public.mapping
@@ -35,8 +33,8 @@ TABLESPACE pg_default;
 
 ALTER TABLE public.mapping
     OWNER to postgres;
--- Index: newUrlIndex
 
+-- Index: newUrlIndex
 -- DROP INDEX public."newUrlIndex";
 
 CREATE INDEX "newUrlIndex"
@@ -101,7 +99,6 @@ ALTER TABLE public.mappingag
 
 -- Index: newURLAGIndex
 -- DROP INDEX public."newURLAGIndex";
-
 CREATE INDEX "newURLAGIndex"
     ON public.mappingag USING btree
     (new_url COLLATE pg_catalog."default" varchar_ops ASC NULLS LAST)
@@ -109,9 +106,7 @@ CREATE INDEX "newURLAGIndex"
 
 
 -- Table: public.url
-
 -- DROP TABLE public.url;
-
 CREATE TABLE public.url
 (
     url_id integer NOT NULL,
@@ -130,7 +125,6 @@ ALTER TABLE public.url
     OWNER to postgres;
 
 -- Table: public.url_whitelist
-
 -- DROP TABLE public.url_whitelist;
 
 CREATE TABLE public.url_whitelist

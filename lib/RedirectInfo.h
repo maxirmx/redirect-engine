@@ -51,6 +51,8 @@ enum RedirectType
     EXPIRED = 1,
     NOT_FOUND = 2,
     NOT_IN_WHITELIST = 3,
+    NO_USER_AGENT = 4,
+    NO_REFERRER = 5
 };
 
 struct ClickInfo
