@@ -15,8 +15,8 @@ public:
     std::chrono::system_clock::time_point expired_on;
     std::string sms_uuid;
     std::unordered_set<std::string> whiteList;
-    std::unordered_set<std::string> refererList;
-    std::unordered_set<std::string> agentList;
+    std::unordered_set<std::string> referrers;
+    std::unordered_set<std::string> agents;
 };
 
 struct DomainInfo
@@ -33,8 +33,8 @@ public:
     std::string out_of_reach_failover_url;
 
     std::unordered_set<std::string> whiteList;
-    std::unordered_set<std::string> refererList;
-    std::unordered_set<std::string> agentList;
+    std::unordered_set<std::string> referrers;
+    std::unordered_set<std::string> agents;
 };
 
 struct CompleteRedirectInfo
@@ -66,5 +66,6 @@ public:
     std::string CountryCode;
     std::string referer;
     std::string user_agent;
+    std::string agent;
     RedirectType Type;
 };

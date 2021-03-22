@@ -71,20 +71,20 @@ void ApiHandler::UpdateMapping(std::string body)
         info->info.whiteList.insert(f.second.get_value<std::string>());  
   }
 
-  info->info.refererList.clear();
+  info->info.referrers.clear();
   {
-    auto refererList = pt.get_child_optional("referrers");
-    if (refererList)
-      for(auto f: *refererList)
-        info->info.refererList.insert(f.second.get_value<std::string>());  
+    auto referrers = pt.get_child_optional("referrers");
+    if (referrers)
+      for(auto f: *referrers)
+        info->info.referrers.insert(f.second.get_value<std::string>());  
   }
 
-  info->info.agentList.clear();
+  info->info.agents.clear();
   {
-    auto agentList = pt.get_child_optional("agents");
-    if (agentList)
-      for(auto f: *agentList)
-        info->info.agentList.insert(f.second.get_value<std::string>());  
+    auto agents = pt.get_child_optional("agents");
+    if (agents)
+      for(auto f: *agents)
+        info->info.agents.insert(f.second.get_value<std::string>());  
   }
 
   
@@ -165,15 +165,15 @@ void ApiHandler::UpdateDomain(std::string body)
     for(auto f: *whiteList)
       info.whiteList.insert(f.second.get_value<std::string>());
 
-  auto refererList = pt.get_child_optional("referrers");
-  if (refererList)
-    for(auto f: *refererList)
-      info.refererList.insert(f.second.get_value<std::string>());
+  auto referrers = pt.get_child_optional("referrers");
+  if (referrers)
+    for(auto f: *referrers)
+      info.referrers.insert(f.second.get_value<std::string>());
 
-  auto agentList = pt.get_child_optional("agents");
-  if (agentList)
-    for(auto f: *agentList)
-      info.agentList.insert(f.second.get_value<std::string>());
+  auto agents = pt.get_child_optional("agents");
+  if (agents)
+    for(auto f: *agents)
+      info.agents.insert(f.second.get_value<std::string>());
 
   processor->UpdateDomain(info);
 
@@ -205,15 +205,15 @@ void ApiHandler::Create(std::string body)
     for(auto f: *whiteList)
       info.whiteList.insert(f.second.get_value<std::string>());
 
-  auto refererList = pt.get_child_optional("referrers");
-  if (refererList)
-    for(auto f: *refererList)
-      info.refererList.insert(f.second.get_value<std::string>());
+  auto referrers = pt.get_child_optional("referrers");
+  if (referrers)
+    for(auto f: *referrers)
+      info.referrers.insert(f.second.get_value<std::string>());
 
-  auto agentList = pt.get_child_optional("agents");
-  if (agentList)
-    for(auto f: *agentList)
-      info.agentList.insert(f.second.get_value<std::string>());
+  auto agents = pt.get_child_optional("agents");
+  if (agents)
+    for(auto f: *agents)
+      info.agents.insert(f.second.get_value<std::string>());
 
   LOG(INFO) << "[API] Create request body: " << body << '\n';
   auto newUrl = processor->StoreRedirection(domain, info);
@@ -274,25 +274,25 @@ void ApiHandler::Remap()
 
     pt.put_child("whitelist", whiteList);
 
-    ptree refererList;
-    for(auto rl : redirect_info->info.refererList)
+    ptree referrers;
+    for(auto rl : redirect_info->info.referrers)
     {
       ptree arrayElement;
       arrayElement.put_value(rl);
-      refererList.push_back(std::make_pair("", arrayElement));
+      referrers.push_back(std::make_pair("", arrayElement));
     }
 
-    pt.put_child("referrers", refererList);
+    pt.put_child("referrers", referrers);
 
-    ptree agentList;
-    for(auto al : redirect_info->info.agentList)
+    ptree agents;
+    for(auto al : redirect_info->info.agents)
     {
       ptree arrayElement;
       arrayElement.put_value(al);
-      agentList.push_back(std::make_pair("", arrayElement));
+      agents.push_back(std::make_pair("", arrayElement));
     }
 
-    pt.put_child("agents", agentList);
+    pt.put_child("agents", agents);
     
 
     std::stringstream ss;

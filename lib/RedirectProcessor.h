@@ -97,8 +97,8 @@ public:
         
 
         UpdateDomainWhiteList(txn, urlID, domainInfo.whiteList);
-        UpdateDomainReferrers(txn, urlID, domainInfo.refererList);
-        UpdateDomainAgents(txn, urlID, domainInfo.agentList);
+        UpdateDomainReferrers(txn, urlID, domainInfo.referrers);
+        UpdateDomainAgents(txn, urlID, domainInfo.agents);
         txn.commit();
 
         LoadDomains();
@@ -138,11 +138,11 @@ public:
             txn.exec_params("INSERT INTO mappingwl(new_url, country_iso) VALUES ($1, $2)", cri.newUrl, wl);
 
         txn.exec_params("DELETE FROM mappingre WHERE new_url = $1", cri.newUrl);
-        for(auto re : cri.info.refererList)
+        for(auto re : cri.info.referrers)
             txn.exec_params("INSERT INTO mappingre(new_url, referrer) VALUES ($1, $2)", cri.newUrl, re);
 
         txn.exec_params("DELETE FROM mappingag WHERE new_url = $1", cri.newUrl);
-        for(auto ag : cri.info.agentList)
+        for(auto ag : cri.info.agents)
             txn.exec_params("INSERT INTO mappingag(new_url, user_agent) VALUES ($1, $2)", cri.newUrl, ag);
 
         txn.commit();
@@ -187,10 +187,10 @@ public:
         for(auto wl : info.whiteList)
             txn.exec_params("INSERT INTO mappingwl(new_url, country_iso) VALUES ($1, $2)", newUrl, wl);
 
-        for(auto re : info.refererList)
+        for(auto re : info.referrers)
             txn.exec_params("INSERT INTO mappingre(new_url, referrer) VALUES ($1, $2)", newUrl, re);
 
-        for(auto ag : info.agentList)
+        for(auto ag : info.agents)
             txn.exec_params("INSERT INTO mappingag(new_url, user_agent) VALUES ($1, $2)", newUrl, ag);
 
         txn.commit();
@@ -359,7 +359,7 @@ private:
                 auto ri = this->storage->Load(*curURL);
                 if(ri)
                 {
-                    ri->refererList = curRE;
+                    ri->referrers = curRE;
                     this->storage->StoreInfo(*curURL, *ri);
                 }
 
@@ -375,7 +375,7 @@ private:
             auto ri = this->storage->Load(*curURL);
             if(ri)
             {
-                ri->refererList = curRE;
+                ri->referrers = curRE;
                 this->storage->StoreInfo(*curURL, *ri);
                 curRE.clear();
             }
@@ -397,7 +397,7 @@ private:
                 auto ri = this->storage->Load(*curURL);
                 if(ri)
                 {
-                    ri->agentList = curAG;
+                    ri->agents = curAG;
                     this->storage->StoreInfo(*curURL, *ri);
                 }
 
@@ -413,7 +413,7 @@ private:
             auto ri = this->storage->Load(*curURL);
             if(ri)
             {
-                ri->agentList = curAG;
+                ri->agents = curAG;
                 this->storage->StoreInfo(*curURL, *ri);
                 curAG.clear();
             }
@@ -484,11 +484,11 @@ private:
 
             pqxx::result re_records { W.exec_params("SELECT referrer FROM url_referrers where url_id = $1", info.url_id) };
             for(auto re : re_records)
-                info.refererList.insert(re[0].as<std::string>());
+                info.referrers.insert(re[0].as<std::string>());
 
             pqxx::result ag_records { W.exec_params("SELECT user_agent FROM url_agents where url_id = $1", info.url_id) };
             for(auto ag : ag_records)
-                info.agentList.insert(ag[0].as<std::string>());
+                info.agents.insert(ag[0].as<std::string>());
 
             domains[info.url] = info;
         }

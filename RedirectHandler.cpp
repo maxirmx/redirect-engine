@@ -54,6 +54,13 @@ void RedirectHandler::onRequest(std::unique_ptr<HTTPMessage> req) noexcept
     clickInfo.CountryCode = processor->GetCountryFromAddress(clickInfo.clientIP);
 
     clickInfo.user_agent = headers.getSingleOrEmpty("User-Agent");
+
+    size_t n = clickInfo.user_agent.find_first_of('/');
+    if (n == std::string::npos) 
+        clickInfo.agent = clickInfo.user_agent;
+    else
+        clickInfo.agent = clickInfo.user_agent.substr(n);
+ 
     clickInfo.referer = headers.getSingleOrEmpty("Referer");
 
 
@@ -98,27 +105,40 @@ void RedirectHandler::onRequest(std::unique_ptr<HTTPMessage> req) noexcept
       {
         redirectedUrl = redirectInfo->domain.expired_url_failover_url;
         clickInfo.Type = RedirectType::EXPIRED;
-      }else
+      }
+      else
       {
-        bool blockByCountry = false;
+        clickInfo.Type = RedirectType::SUCCESS;
 
-        if(!redirectInfo->domain.whiteList.empty()
+        if (!redirectInfo->domain.whiteList.empty()
           && redirectInfo->domain.whiteList.find(clickInfo.CountryCode) == redirectInfo->domain.whiteList.end())
-            blockByCountry = true;
+            clickInfo.Type = RedirectType::NOT_IN_WHITELIST;
 
-        if(!redirectInfo->info.whiteList.empty()
+        if (!redirectInfo->info.whiteList.empty()
           && redirectInfo->info.whiteList.find(clickInfo.CountryCode) == redirectInfo->info.whiteList.end())
-          blockByCountry = true;
-
-        if(blockByCountry)
-        {
-          redirectedUrl = redirectInfo->domain.out_of_reach_failover_url;          
           clickInfo.Type = RedirectType::NOT_IN_WHITELIST;
-        }else
-        {
-          redirectedUrl = redirectInfo->info.orig_url;          
-          clickInfo.Type = RedirectType::SUCCESS;
-        }
+
+        if (!redirectInfo->domain.referrers.empty()
+          && redirectInfo->domain.referrers.find(clickInfo.referer) == redirectInfo->domain.referrers.end())
+            clickInfo.Type = RedirectType::NO_REFERRER;
+
+        if (!redirectInfo->info.referrers.empty()
+          && redirectInfo->info.referrers.find(clickInfo.referer) == redirectInfo->info.referrers.end())
+          clickInfo.Type = RedirectType::NO_REFERRER;
+
+        if (!redirectInfo->domain.agents.empty()
+          && redirectInfo->domain.agents.find(clickInfo.agent) == redirectInfo->domain.agents.end())
+            clickInfo.Type = RedirectType::NO_USER_AGENT;
+            
+        if (!redirectInfo->info.agents.empty()
+          && redirectInfo->info.agents.find(clickInfo.agent) == redirectInfo->info.agents.end())
+          clickInfo.Type = RedirectType::NO_USER_AGENT;
+
+
+        redirectedUrl = clickInfo.Type == RedirectType::SUCCESS ?
+                        redirectInfo->info.orig_url:
+                        redirectInfo->domain.out_of_reach_failover_url;          
+          
       }
     }
 
