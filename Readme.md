@@ -150,16 +150,16 @@ Count: 0
 * "update_domain" command creates or updates domain:
 
 ```
-url -v --header "Content-Type: application/json" \
+curl -v --header "Content-Type: application/json" \
                   --request POST \
-                  --data  '{"domain" : "192.99.10.113:12000", \
-                            "expired_on" : "2022-11-17 12:00:00", \
-                            "default_url" : "http://nyt.com", \
-                            "no_url_failover_url" : "http://www.washingtonpost.com/", \
-                            "expired_url_failover_url" : "http://www.latimes.com/", \
-                            "out_of_reach_failover_url" : "http://www.chicagotribune.com/", \
-                            "whitelist" : ["", "RU", "US"], \
-                            "referrers" : ["twitter.com", "facebook.com"], \
+                  --data  '{"domain" : "192.99.10.113:12000", 
+                            "expired_on" : "2022-11-17 12:00:00", 
+                            "default_url" : "http://nyt.com", 
+                            "no_url_failover_url" : "http://www.washingtonpost.com/", 
+                            "expired_url_failover_url" : "http://www.latimes.com/", 
+                            "out_of_reach_failover_url" : "http://www.chicagotribune.com/", 
+                            "whitelist" : ["", "RU", "US"], 
+                            "referrers" : ["twitter.com", "facebook.com"], 
                             "user_agents" : ["curl"] }' \
                   http://192.99.10.113:11000/api/update_domain
 ```
@@ -183,13 +183,13 @@ curl -v --header "Content-Type: application/json" \
 ```
 curl -v --header "Content-Type: application/json" \
                   --request POST \
-                  --data '{"orig_url":"http://www.dallasnews.com/", \
-                  "created_on":"2020-11-17 17:39:49.546162", \
-                  "expired_on" : "2021-11-17 17:39:49.546162", \
-                  "sms_uuid":"827dd855fc1c", \
-                  "domain":"192.99.10.113:12000", \
-                  "whitelist":["", "RU", "US"], \
-                  "referrers" : ["twitter.com", "facebook.com"], \
+                  --data '{"orig_url":"http://www.dallasnews.com/", 
+                  "created_on":"2020-11-17 17:39:49.546162", 
+                  "expired_on" : "2021-11-17 17:39:49.546162", 
+                  "sms_uuid":"827dd855fc1c", 
+                  "domain":"192.99.10.113:12000", 
+                  "whitelist":["", "RU", "US"], 
+                  "referrers" : ["twitter.com", "facebook.com"], 
                   "user_agents" : ["curl"] }' \
                   http://192.99.10.113:11000/api/create
 ```
@@ -204,12 +204,12 @@ User agent match is checked up to the first '/' symbol.   For example, if user a
 ```
 curl -v --header "Content-Type: application/json" \
                   --request POST \
-                  --data '{"newUrl" : "http://192.99.10.113:12000/LBItIU", \
-                  "orig_url" : "http://sacobserver.com/", \
-                  "expired_on" : "2022-11-17 12:00:00", \
-                  "sms_uuid" : "827dd855fd1c", \
-                  "whitelist":["", "AU", "CA"], \
-                  "referrers" : ["twitter.com", "facebook.com"], \
+                  --data '{"newUrl" : "http://192.99.10.113:12000/LBItIU", 
+                  "orig_url" : "http://sacobserver.com/", 
+                  "expired_on" : "2022-11-17 12:00:00", 
+                  "sms_uuid" : "827dd855fd1c", 
+                  "whitelist":["", "AU", "CA"], 
+                  "referrers" : ["twitter.com", "facebook.com"], 
                   "user_agents" : ["curl"] }' \
                   http://192.99.10.113:11000/api/update_redirect
 ```
