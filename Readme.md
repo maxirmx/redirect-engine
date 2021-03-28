@@ -192,7 +192,7 @@ User agent match is checked up to the first '/' symbol.   For example, if user a
 * "delete_redirect" command deletes redirect and all associated whitelists, referrers, user agents
 
 ```
-curl -v --header "Content-Type: application/json" --request POST --data '{"newUrl" : "http://localhost:12000/LBItIU" }' http://192.99.10.113:11000/api/delete_redirect
+curl -v --header "Content-Type: application/json" --request POST --data '{"newUrl" : "http://192.99.10.113:12000/LBItIU" }' http://192.99.10.113:11000/api/delete_redirect
 ```
 
 ### watch clicks table count
