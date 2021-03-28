@@ -11,7 +11,7 @@ sudo yum install python3 postresql-devel
 
 **turn on GCC 8.x for current session**
 
-scl enable devtoolset-8 bash
+source scl_source enable devtoolset-8 
 
 **Check that gcc version is higher than 8.3.1**
 
@@ -90,6 +90,7 @@ sudo make install
 ## compilation of program
 **The repo is in ~/Development/engine**
 ```
+source scl_source enable devtoolset-8 
 cd ~/Development/engine
 mkdir release
 cd release
