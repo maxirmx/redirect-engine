@@ -88,7 +88,9 @@ sudo make install
 ```
 
 ## compilation of program
-**The repo is in ~/Development/<user>/engine**
+**The repo shall be cloned to ~/Development/<user>/engine**
+The latest version is in this fork:
+git clone http://stash.denovolab.com/scm/~samsonov/engine.git
 ```
 source scl_source enable devtoolset-8 
 cd ~/Development/engine
