@@ -101,21 +101,22 @@ void ApiHandler::DeleteMapping(std::string body)
   ptree pt;
   std::istringstream is(body);
   boost::property_tree::read_json(is, pt);
+  
+  auto newUrl = pt.get<std::string>("newUrl");
 
-  LOG(INFO) << "[API] deleting mapping for : " << pt.get<std::string>("newUrl") << '\n';
-  bool deleted = processor->DeleteRedirectionInfo(pt.get<std::string>("newUrl"));
+  bool deleted = processor->DeleteRedirectionInfo(newUrl);
   
 
   if (deleted) 
   {
-    LOG(INFO) << "[API] mapping deleted: " << deleted << '\n';
+    LOG(INFO) << "[API] mapping for " << newUrl << " deleted: " << deleted << '\n';
     ResponseBuilder(downstream_)
       .status(200, "OK")
       .send();
   }
   else
   {
-    std::string msg = std::string("Mapping for ") + pt.get<std::string>("newUrl") + " was not found";
+    std::string msg = std::string("Mapping for ") + newUrl + " was not found";
     LOG(ERROR) << msg << '\n';
 
     ptree resJson;
