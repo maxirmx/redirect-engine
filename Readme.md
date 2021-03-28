@@ -88,7 +88,7 @@ sudo make install
 ```
 
 ## compilation of program
-**The repo is in ~/Development/engine**
+**The repo is in ~/Development/<user>/engine**
 ```
 source scl_source enable devtoolset-8 
 cd ~/Development/engine
