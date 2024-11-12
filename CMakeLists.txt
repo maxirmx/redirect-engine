@@ -57,39 +57,21 @@ find_library(FMT fmt REQUIRED)
 
 # this is a GNU library, sometimes it emerges by itself from binutils
 find_library(LIBIBERTY iberty)
+if (NOT LIBIBERTY)
+    set(LIBIBERTY "")
+endif(NOT LIBIBERTY)
 
 
 set(LIBS
-        ${PROXYGENHTTPSERVER}
-		${PROXYGEN}
-        ${WANGLE}
-		${FIZZ}
-        ${FOLLY}
-        ${ROCKSDB}
-        ${GLOG}
-        ${GFLAGS}
-        ${SSL}
-        ${ZLIB}
-        ${EVENT}
-        ${CRYPTO}
-        ${Boost_LIBRARIES}
-        ${PTHREAD}
-        ${CMAKE_THREAD_LIBS_INIT}
-        ${DOUBLE_CONVERSION}
-        ${SNAPPY}
-        ${JEMALLOC}
-		${SODIUM}
-        ${UNWIND}
-        ${LIBIBERTY}
-        ${PQXX}
-        ${PQ}
-        ${GEOIP}
-		${ZLIB}
-        ${LZMA}
-        ${LZ4}
-        ${BZIP2}
-        ${ZSTD}
-        ${FMT})
+    ${PROXYGENHTTPSERVER}    ${PROXYGEN}                 ${WANGLE}             ${FIZZ}
+    ${FOLLY}                 ${GLOG}                     ${GFLAGS}             ${SSL}
+    ${ZLIB}                  ${EVENT}                    ${CRYPTO}             ${Boost_LIBRARIES}
+    ${PTHREAD}               ${CMAKE_THREAD_LIBS_INIT}   ${DOUBLE_CONVERSION}  ${SNAPPY}
+    ${JEMALLOC}              ${SODIUM}                   ${UNWIND}             ${LIBIBERTY}
+    ${PQXX}                  ${PQ}                       ${GEOIP}              ${ZLIB}
+    ${LZMA}                  ${LZ4}                      ${BZIP2}              ${ZSTD}
+    ${FMT}
+)
 
 add_executable(app ${SOURCES})
 target_link_libraries(${PROJECT_NAME} ${LIBS})
