@@ -8,7 +8,7 @@ set(BOOST_USE_STATIC_LIBS ON)
 set(BOOST_USE_MULTITHREADED ON)
 set(BOOST_USE_STATIC_RUNTIME OFF)
 
-FIND_PACKAGE( Boost 1.60 COMPONENTS date_time regex REQUIRED ) 
+FIND_PACKAGE( Boost 1.60 COMPONENTS date_time regex REQUIRED )
 link_directories(/usr/local/lib)
 
 set(SOURCES main.cpp ApiHandler.cpp RedirectHandler.cpp)
@@ -32,7 +32,9 @@ find_library(D double-conversion)
 
 set(LIBS
         ${PROXYGENHTTPSERVER}
+		proxygen
         ${WANGLE}
+		fizz
         ${FOLLY}
         ${ROCKSDB}
         ${GLOG}
@@ -48,21 +50,21 @@ set(LIBS
         ${SNAPPY}
         ${jemalloc}
 		dl
-		proxygen
 		boost_context
-		fizz
 		sodium
 		z
-		folly
-        pq
+        unwind
+        iberty
         pqxx
+        pq
         GeoIP
         ${Boost_DATE_TIME_LIBRARY}
         ${Boost_REGEX_LIBRARY}
         lzma
+        lz4
         bz2
-        zstd)
+        zstd
+        fmt)
 
 add_executable(app ${SOURCES})
 target_link_libraries(${PROJECT_NAME} ${LIBS})
- 

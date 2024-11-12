@@ -1,5 +1,5 @@
 export V_PQXX=6.4.5
-export V_GEOIP=1.6.12
+cd ..
 
 # sudo yum install https://download.postgresql.org/pub/repos/yum/reporpms/EL-7-x86_64/pgdg-redhat-repo-latest.noarch.rpm \
 sudo yum -y install postgresql-devel \
@@ -15,4 +15,3 @@ sudo yum -y install postgresql-devel \
 && mkdir -p ~/Development/geoipdat \
 && cp ~/bootstrap/geoip-api-c-${V_GEOIP}/data/GeoIP.dat ~/Development/geoipdat/ \
 && mkdir -p ~Development/engine/release/logs
-
