@@ -8,63 +8,78 @@ set(BOOST_USE_STATIC_LIBS ON)
 set(BOOST_USE_MULTITHREADED ON)
 set(BOOST_USE_STATIC_RUNTIME OFF)
 
-FIND_PACKAGE( Boost 1.60 COMPONENTS date_time regex REQUIRED )
-link_directories(/usr/local/lib)
+#Boost configuration
+set(BOOST_USE_STATIC_LIBS ON)
+set(BOOST_USE_MULTITHREADED ON)
+set(BOOST_USE_STATIC_RUNTIME OFF)
+find_package(Boost 1.60 REQUIRED COMPONENTS date_time regex context)
 
+# Thread support
+find_package(Threads REQUIRED)
 set(SOURCES main.cpp ApiHandler.cpp RedirectHandler.cpp)
 
-find_library(FOLLY folly)
-find_library(SNAPPY snappy)
-find_library(WANGLE wangle)
-find_package(Threads)
-find_library(GFLAGS gflags)
-find_library(GLOG glog)
-find_library(Z z)
-find_library(SSL ssl)
-find_library(CRYPTO crypto)
-find_library(PROXYGENHTTPSERVER proxygenhttpserver)
-find_library(GTEST gtest)
-find_library(GTEST_MAIN gtest_main)
-find_library(DL dl)
-find_library(jemalloc jemalloc)
-find_library(EVENT event)
-find_library(D double-conversion)
-
+find_library(FOLLY folly REQUIRED)
+find_library(SNAPPY snappy REQUIRED)
+find_library(WANGLE wangle REQUIRED)
+find_library(FIZZ fizz REQUIRED)
+find_library(GFLAGS gflags REQUIRED)
+find_library(GLOG glog REQUIRED)
+find_library(ZLIB z REQUIRED)
+find_library(SSL ssl REQUIRED)
+find_library(CRYPTO crypto REQUIRED)
+find_library(PROXYGENHTTPSERVER proxygenhttpserver REQUIRED)
+find_library(PROXYGEN proxygen REQUIRED)
+#find_library(GTEST ls /usr/local/sharegtest REQUIRED)
+#find_library(GTEST_MAIN gtest_main REQUIRED)
+#find_library(DL dl REQUIRED)
+find_library(JEMALLOC jemalloc REQUIRED)
+find_library(EVENT event REQUIRED)
+find_library(DOUBLE_CONVERSION double-conversion REQUIRED)
+find_library(SODIUM sodium REQUIRED)
+find_library(UNWIND unwind REQUIRED)
+find_library(IBERTY iberty REQUIRED)
+find_library(PQXX pqxx REQUIRED)
+find_library(PQ pq REQUIRED)
+find_library(GEOIP GeoIP REQUIRED)
+find_library(LZMA lzma REQUIRED)
+find_library(LZ4 lz4 REQUIRED)
+find_library(BZIP2 bz2 REQUIRED)
+find_library(ZSTD zstd REQUIRED)
+find_library(FMT fmt REQUIRED)
 set(LIBS
         ${PROXYGENHTTPSERVER}
-		proxygen
+		${PROXYGEN}
         ${WANGLE}
-		fizz
+		${FIZZ}
         ${FOLLY}
         ${ROCKSDB}
         ${GLOG}
         ${GFLAGS}
         ${SSL}
-        ${Z}
+        ${ZLIB}
         ${EVENT}
         ${CRYPTO}
         ${Boost_LIBRARIES}
         ${PTHREAD}
         ${CMAKE_THREAD_LIBS_INIT}
-        ${D}
+        ${DOUBLE_CONVERSION}
         ${SNAPPY}
-        ${jemalloc}
-		dl
-		boost_context
-		sodium
-		z
-        unwind
-        iberty
-        pqxx
-        pq
-        GeoIP
+        ${JEMALLOC}
+		${SODIUM}
+        ${UNWIND}
+        ${IBERTY}
+        ${PQXX}
+        ${PQ}
+        ${GEOIP}
+        ${Boost_LIBRARIES}
         ${Boost_DATE_TIME_LIBRARY}
         ${Boost_REGEX_LIBRARY}
-        lzma
-        lz4
-        bz2
-        zstd
-        fmt)
+		${ZLIB}
+        ${LZMA}
+        ${LZ4}
+        ${BZIP2}
+        ${ZSTD}
+        ${FMT})
 
 add_executable(app ${SOURCES})
 target_link_libraries(${PROJECT_NAME} ${LIBS})
