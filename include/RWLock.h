@@ -69,9 +69,9 @@ public:
     {
         lock->WriteUnlock();
     }
-    
+
 private:
-    
+
 
     RWLock *lock;
 };
@@ -90,7 +90,7 @@ public:
         lock->ReadUnlock();
     }
 private:
-    
+
 
     RWLock *lock;
 };

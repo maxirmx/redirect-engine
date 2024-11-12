@@ -15,9 +15,10 @@
 
 #include "ApiHandler.h"
 #include "RedirectHandler.h"
+#include "DbEnsure.h"
 
-#include "lib/RedirectProcessor.h"
-#include "lib/PBULKBackendClicks.h"
+#include "RedirectProcessor.h"
+#include "PBULKBackendClicks.h"
 
 using namespace EchoService;
 using namespace proxygen;
@@ -102,7 +103,7 @@ int main(int argc, char* argv[]) {
     return 1;
   }
 
-  auto gi = GeoIP_open(FLAGS_geoip.c_str(), GEOIP_MEMORY_CACHE); 
+  auto gi = GeoIP_open(FLAGS_geoip.c_str(), GEOIP_MEMORY_CACHE);
   if(gi == 0)
       throw std::runtime_error("can't load geoip database");
 
@@ -110,6 +111,16 @@ int main(int argc, char* argv[]) {
     FLAGS_threads = sysconf(_SC_NPROCESSORS_ONLN);
     CHECK(FLAGS_threads > 0);
   }
+
+  try {
+    pqxx::connection connection("dbname=mydatabase user=mylogin password=mypass hostaddr=127.0.0.1 port=5432");
+    DbEnsure dbe(connection);
+    dbe.Ensure();
+  } catch (const std::exception& ex) {
+        std::cerr << ex.what() << std::endl;
+        return 1;
+  }
+
 
   auto processor = std::make_shared<RedirectProcessor>(FLAGS_postgres, gi);
   processor->use_async_store = FLAGS_use_async_commit;
@@ -168,7 +179,7 @@ int main(int argc, char* argv[]) {
 
 // ****************************************************************** //
 
-  
+
   t_api.join();
   server_redirect.stop();
   t_redirect.join();

@@ -2,8 +2,8 @@
 
 #include <folly/Memory.h>
 #include <proxygen/httpserver/RequestHandler.h>
-#include "lib/RedirectProcessor.h"
-#include "lib/Reporting.h"
+#include "RedirectProcessor.h"
+#include "Reporting.h"
 
 namespace proxygen {
 class ResponseHandler;

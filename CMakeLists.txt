@@ -14,9 +14,19 @@ set(BOOST_USE_MULTITHREADED ON)
 set(BOOST_USE_STATIC_RUNTIME OFF)
 find_package(Boost 1.60 REQUIRED COMPONENTS date_time regex context)
 
+add_definitions(-DBOOST_BIND_GLOBAL_PLACEHOLDERS)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
+
 # Thread support
 find_package(Threads REQUIRED)
-set(SOURCES main.cpp ApiHandler.cpp RedirectHandler.cpp)
+
+set(SOURCES
+        main.cpp
+        ApiHandler.cpp
+        RedirectHandler.cpp
+        DbEnsure.cpp
+        include/DbEnsure.h
+)
 
 find_library(FOLLY folly REQUIRED)
 find_library(SNAPPY snappy REQUIRED)
@@ -46,6 +56,7 @@ find_library(LZ4 lz4 REQUIRED)
 find_library(BZIP2 bz2 REQUIRED)
 find_library(ZSTD zstd REQUIRED)
 find_library(FMT fmt REQUIRED)
+
 set(LIBS
         ${PROXYGENHTTPSERVER}
 		${PROXYGEN}
@@ -71,9 +82,6 @@ set(LIBS
         ${PQXX}
         ${PQ}
         ${GEOIP}
-        ${Boost_LIBRARIES}
-        ${Boost_DATE_TIME_LIBRARY}
-        ${Boost_REGEX_LIBRARY}
 		${ZLIB}
         ${LZMA}
         ${LZ4}
