@@ -57,7 +57,7 @@ public:
         txn.exec_params("DELETE FROM url_referrers WHERE url_id = $1;", urlID );
         txn.exec_params("DELETE FROM url_agents WHERE url_id = $1;", urlID );
         txn.exec_params("DELETE FROM url WHERE url = $1;", domain );
-        
+
 
         txn.commit();
 
@@ -69,7 +69,7 @@ public:
     {
         std::lock_guard lock(this->store_redirect_mutex);
         pqxx::work txn{*this->store_redirects_connection};
-        
+
         int urlID = 0;
         pqxx::result res { txn.exec_params("SELECT url_id FROM url WHERE url = $1;", domainInfo.url ) };
         if(res.empty())
@@ -78,11 +78,11 @@ public:
             if(!max_urlid_fdb.is_null())
                 urlID = max_urlid_fdb.as<int>() + 1;
 
-            txn.exec_params("INSERT INTO url(url_id, url, created_on, expired_on, default_url, no_url_failover_url, expired_url_failover_url, out_of_reach_failover_url) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)", 
+            txn.exec_params("INSERT INTO url(url_id, url, created_on, expired_on, default_url, no_url_failover_url, expired_url_failover_url, out_of_reach_failover_url) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
                         urlID, domainInfo.url,  ToTimeStampString(std::chrono::system_clock::now()), ToTimeStampString(domainInfo.expired_on),
                         domainInfo.default_url, domainInfo.no_url_failover_url, domainInfo.expired_url_failover_url, domainInfo.out_of_reach_failover_url);
 
-            LOG(INFO) << "[API] Created new DOMAIN" 
+            LOG(INFO) << "[API] Created new DOMAIN"
                         << " url: " << domainInfo.url
                         << " id: " << urlID;
         }
@@ -92,7 +92,7 @@ public:
             txn.exec_params("UPDATE url	SET expired_on=$2, default_url=$3, no_url_failover_url=$4, expired_url_failover_url=$5, out_of_reach_failover_url=$6 WHERE url_id = $1",
                 urlID, ToTimeStampString(domainInfo.expired_on), domainInfo.default_url, domainInfo.no_url_failover_url, domainInfo.expired_url_failover_url, domainInfo.out_of_reach_failover_url);
         }
-        
+
 
         UpdateDomainWhiteList(txn, urlID, domainInfo.whiteList);
         UpdateDomainReferrers(txn, urlID, domainInfo.referrers);
@@ -101,7 +101,7 @@ public:
 
         LoadDomains();
     }
-    
+
 
     std::string GetCountryFromAddress(const std::string &address)
     {
@@ -128,9 +128,9 @@ public:
     {
         std::lock_guard lock(this->store_redirect_mutex);
         pqxx::work txn { *this->store_redirects_connection };
-        txn.exec_params("UPDATE mapping SET orig_url=$2, expired_on=$3, sms_uuid=$4	WHERE new_url=$1", 
+        txn.exec_params("UPDATE mapping SET orig_url=$2, expired_on=$3, sms_uuid=$4	WHERE new_url=$1",
                 cri.newUrl, cri.info.orig_url, ToTimeStampString(cri.info.expired_on), cri.info.sms_uuid );
-        
+
         txn.exec_params("DELETE FROM mappingwl WHERE new_url = $1", cri.newUrl);
         for(auto wl : cri.info.whiteList)
             txn.exec_params("INSERT INTO mappingwl(new_url, country_iso) VALUES ($1, $2)", cri.newUrl, wl);
@@ -198,7 +198,7 @@ public:
         res.newUrl = newUrl;
         res.collisions = collisions;
         return res;
-    }    
+    }
 
     std::optional<CompleteRedirectInfo> Load(std::string key)
     {
@@ -212,19 +212,19 @@ public:
         boost::cmatch what;
         if(!regex_match(key.c_str(), what, ex))
             throw std::runtime_error("cannot extract domain");
-        
-        
+
+
         auto s_domain = std::string(what[2].first, what[2].second);
         auto port = std::string(what[3].first, what[3].second);
         auto domain = s_domain;
         if(!port.empty())
             domain += ":" + std::string(port);
 
-        
+
         auto f_d_i = this->domains.find(domain);
         if(f_d_i == this->domains.end())
             throw std::runtime_error("domain: " + domain + " not loaded or doesn't exist in url table, please restart service");
-        
+
 
         CompleteRedirectInfo res;
         res.info = (*info);
@@ -419,21 +419,21 @@ private:
     }
 
     void UpdateDomainWhiteList(pqxx::work &txn, int urlId, const std::unordered_set<std::string> &countrycodes)
-    {   
+    {
         txn.exec_params("delete FROM url_whitelist WHERE url_id = $1", urlId);
         for(auto c : countrycodes)
             txn.exec_params("INSERT INTO url_whitelist(url_id, country_iso)	VALUES ($1, $2)", urlId, c);
     }
 
     void UpdateDomainReferrers(pqxx::work &txn, int urlId, const std::unordered_set<std::string> &referrers)
-    {   
+    {
         txn.exec_params("delete FROM url_referrers WHERE url_id = $1", urlId);
         for(auto c : referrers)
             txn.exec_params("INSERT INTO url_referrers(url_id, referrer) VALUES ($1, $2)", urlId, c);
     }
 
     void UpdateDomainAgents(pqxx::work &txn, int urlId, const std::unordered_set<std::string> &agents)
-    {   
+    {
         txn.exec_params("delete FROM url_agents WHERE url_id = $1", urlId);
         for(auto c : agents)
             txn.exec_params("INSERT INTO url_agents(url_id, user_agent) VALUES ($1, $2)", urlId, c);
@@ -501,7 +501,7 @@ private:
     {
         typedef std::uniform_int_distribution<> D;
         std::string res = "http://" + targetDomain + "/";
-        
+
         D n_type(0, 2);
         D a_type('A', 'Z');
         D b_type('a', 'z');
