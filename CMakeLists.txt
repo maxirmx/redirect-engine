@@ -41,13 +41,11 @@ find_library(PROXYGENHTTPSERVER proxygenhttpserver REQUIRED)
 find_library(PROXYGEN proxygen REQUIRED)
 #find_library(GTEST ls /usr/local/sharegtest REQUIRED)
 #find_library(GTEST_MAIN gtest_main REQUIRED)
-#find_library(DL dl REQUIRED)
 find_library(JEMALLOC jemalloc REQUIRED)
 find_library(EVENT event REQUIRED)
 find_library(DOUBLE_CONVERSION double-conversion REQUIRED)
 find_library(SODIUM sodium REQUIRED)
 find_library(UNWIND unwind REQUIRED)
-find_library(IBERTY iberty REQUIRED)
 find_library(PQXX pqxx REQUIRED)
 find_library(PQ pq REQUIRED)
 find_library(GEOIP GeoIP REQUIRED)
@@ -56,6 +54,10 @@ find_library(LZ4 lz4 REQUIRED)
 find_library(BZIP2 bz2 REQUIRED)
 find_library(ZSTD zstd REQUIRED)
 find_library(FMT fmt REQUIRED)
+
+# this is a GNU library, sometimes it emerges by itself from binutils
+find_library(LIBIBERTY iberty)
+
 
 set(LIBS
         ${PROXYGENHTTPSERVER}
@@ -78,7 +80,7 @@ set(LIBS
         ${JEMALLOC}
 		${SODIUM}
         ${UNWIND}
-        ${IBERTY}
+        ${LIBIBERTY}
         ${PQXX}
         ${PQ}
         ${GEOIP}
